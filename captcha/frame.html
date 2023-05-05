@@ -1,5 +1,5 @@
 <html><div id="log">
-Content in iframe vvv
+Main frame things:
 <br>
 </div>
 <iframe src="https://lol-kek.surge.sh/blob_worker.html" title="kek" height="100%" width="100%"></iframe>
@@ -11,8 +11,8 @@ Content in iframe vvv
 		document.getElementById("log").innerHTML += Date() + ": " + text + '\n<br>\n';
 	}
 
-	print(navigator.userAgent);
-	print(navigator.platform);
-	print(navigator.hardwareConcurrency);
+	print('UA:', navigator.userAgent);
+	print('Platform:', navigator.platform);
+	print('Hardware Concurrency:', navigator.hardwareConcurrency);
 
 </script>
