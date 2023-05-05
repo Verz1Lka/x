@@ -1,0 +1,18 @@
+<html><div id="log">
+Content in iframe vvv
+<br>
+</div>
+<iframe src="https://lol-kek.surge.sh/blob_worker.html" title="kek" height="100%" width="100%"></iframe>
+</html>
+
+<script>
+
+	function print(text) {
+		document.getElementById("log").innerHTML += Date() + ": " + text + '\n<br>\n';
+	}
+
+	print(navigator.userAgent);
+	print(navigator.platform);
+	print(navigator.hardwareConcurrency);
+
+</script>

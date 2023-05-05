@@ -1,0 +1,10 @@
+async function smartproxy(page, url) {
+  await page.goto(url);
+  await page.waitForTimeout(10000)
+  content = await page.content()
+  //const text = await page.evaluate(() => {
+  //  const el = document.querySelector('h1');
+  //  return el.textContent;
+  //});
+  return content;
+}

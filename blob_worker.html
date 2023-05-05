@@ -1,0 +1,108 @@
+
+<html><body><div id="log">Blob worker example<br></div></body></html>
+
+<script>
+
+	function print(text) {
+		document.getElementById("log").innerHTML += Date() + ": " + text + '\n<br>\n';
+	}
+
+	print(navigator.userAgent);
+	print(navigator.platform);
+	print(navigator.hardwareConcurrency);
+	//document.write("<button onclick='startComputation()'>Start computation</button>");
+	//document.write('<div id="log">Blob worker example<br></div>');
+
+	var worker_blob = new Blob(["postMessage(navigator.platform);"], {type: 'application/javascript'});
+	var worker_blob_url = URL.createObjectURL(worker_blob);
+
+	//var internal_blob = new Blob(["Object.defineProperty(navigator, 'platform', { get: function () { return 'Win32'; }, configurable: true, enumerable: true }); postMessage('message from internal blob')"], {type: 'application/javascript'});
+	//console.log(internal_blob);
+    //var internal_blob_url = URL.createObjectURL(internal_blob);
+
+    //rr = fetch(internal_blob_url).then(res => res.text().then(rres => console.log(rres)));
+    //console.log(rr);
+
+    
+   //  function print_obj(obj) {
+   //  	for(var property in obj){ 
+   //  		var str = obj[property]
+   //  		if (typeof(str) == 'object') {
+
+   //  			for(var prop in str){ 
+   //  				var s = str[prop];
+   //  				document.write(property+ ": "+str + ": " + s + "<br>" );
+   //  		}}
+   //  		else {
+   //  			document.write(property+ ": "+str + "<br>" );
+   //  		};
+			// };
+   //  	}
+
+    //print_obj(navigator);
+
+	//var blob = new Blob([`postMessage('message from external blob kek');importScripts("${internal_blob_url}")`], {type: 'application/javascript'});
+    //var worker_blob_url = URL.createObjectURL(blob);
+
+	//var worker = new Worker("worker.js");
+	var worker = new Worker(worker_blob_url);
+	//var worker1 = new Worker("worker2.js");
+	//debugger;
+	
+	 worker.onmessage = (evt) => {
+     print("Message posted from webworker: " + JSON.stringify(evt.data));
+     window.parent.postMessage('ahahahah', "*");
+	 }
+
+	// worker.onmessage = (evt) => {
+ //    	document.write(Date() + ": Message posted from webworker0: " + JSON.stringify(evt.data) + "<br>");
+	// }
+
+	// worker.onerror = function(event) {
+ //  		console.log('There is an error with your worker0!', event);
+	// }
+
+	// worker1.onmessage = (evt) => {
+ //    	document.write(Date() + ": Message posted from webworker1: " + evt.data + "<br>");
+	// }
+
+	// worker1.onerror = function(event) {
+ //  		console.log('There is an error with your worker1!', event);
+	// }
+
+  //function startComputation() {
+
+    //var worker = new Worker("worker.js");
+
+// Получение сообщений, переданных при вызовах postMessage() в веб-воркере
+
+// Передача данных веб-воркеру
+
+// function greet() {
+//  worker1.postMessage({data: "123456789"});
+// }
+// greet();
+
+// setTimeout(greet, 2000)
+
+
+
+  //}
+
+ //  for(var property in navigator){ 
+ //    var str = navigator[property]
+ //    document.write(property+ ": "+str + "<br>");
+
+	// };
+
+	
+
+
+
+
+// worker.addEventListener('message', (evt) => {
+//     console.log("Message posted from webworker: " + evt.data);
+// });
+
+  
+</script>
