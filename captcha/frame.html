@@ -7,8 +7,8 @@ Main frame things:
 
 <script>
 
-	function print(text) {
-		document.getElementById("log").innerHTML += Date() + ": " + text + '\n<br>\n';
+	function print(...text) {
+		document.getElementById("log").innerHTML += Date() + ": " + text.join(' | ') + '\n<br>\n';
 	}
 
 	print('UA:', navigator.userAgent);
