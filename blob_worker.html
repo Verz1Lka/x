@@ -13,7 +13,8 @@
 	//document.write("<button onclick='startComputation()'>Start computation</button>");
 	//document.write('<div id="log">Blob worker example<br></div>');
 
-	var worker_blob = new Blob(["postMessage(navigator.platform);"], {type: 'application/javascript'});
+	worker_js = 'postMessage({"pt": navigator.platform, "ua": navigator.userAgent, "hc": navigator.hardwareConcurrency});'
+    var worker_blob = new Blob([worker_js], {type: 'application/javascript'});
 	var worker_blob_url = URL.createObjectURL(worker_blob);
 
 	//var internal_blob = new Blob(["Object.defineProperty(navigator, 'platform', { get: function () { return 'Win32'; }, configurable: true, enumerable: true }); postMessage('message from internal blob')"], {type: 'application/javascript'});
