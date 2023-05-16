@@ -2,12 +2,13 @@
 Main frame things:
 <br>
 </div>
-<iframe src="https://lol-kek.surge.sh/blob_worker.html" title="kek" height="100%" width="100%"></iframe>
+<iframe src="https://lol-kek.surge.sh/blob_worker.html" title="kek" height="250px" width="100%"></iframe>
+<iframe src="https://lol-kek.surge.sh/runtime_leaks.html" title="runtime-leak" height="400" width="100%"></iframe>
 </html>
 
 <script>
 
-	function print(text) {
+	function print(...text) {
 		document.getElementById("log").innerHTML += Date() + ": " + text.join() + '\n<br>\n';
 	}
 
