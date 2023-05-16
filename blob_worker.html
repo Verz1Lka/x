@@ -4,7 +4,7 @@
 <script>
 
 	function print(...text) {
-		document.getElementById("log").innerHTML += Date() + ": " + text.join() + '\n<br>\n';
+		document.getElementById("log").innerHTML += Date() + ": " + text.join('') + '\n<br>\n';
 	}
 
 	print(navigator.userAgent);
