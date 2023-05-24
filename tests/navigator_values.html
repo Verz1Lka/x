@@ -12,6 +12,8 @@
 <script>
     for(var property in navigator){
         var str = navigator[property]
-        document.write(property+ "&nbsp;&nbsp;<em>"+str+"</em><br />");
+        if (typeof str != 'object' && typeof str != 'function') {
+            document.write(property + "&nbsp;&nbsp;<em>" + str + "</em><br />");
+        }
     }
 </script>
