@@ -19,6 +19,19 @@ Main frame things:
         }
     }
 
+    const gl = document.createElement("canvas").getContext("webgl");
+    print('gl.VERSION' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.VERSION) + "</em><br />")
+    print('gl.SHADING_LANGUAGE_VERSION' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.SHADING_LANGUAGE_VERSION) + "</em><br />");
+    print('gl.VENDOR' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.VENDOR) + "</em><br />");
+
+    const ext = gl.getExtension("WEBGL_debug_renderer_info");
+
+    // if the extension exists, find out the info.
+    if (ext) {
+        print('UNMASKED_VENDOR_WEBGL' + "&nbsp;&nbsp;<em>" + gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) + "</em><br />");
+        print('UNMASKED_RENDERER_WEBGL' + "&nbsp;&nbsp;<em>" + gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) + "</em><br />");
+    }
+
 	// print('UA: ', navigator.userAgent);
 	// print('Platform: ', navigator.platform);
 	// print('Hardware Concurrency: ', navigator.hardwareConcurrency);
