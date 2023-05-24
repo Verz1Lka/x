@@ -4,17 +4,56 @@
 <script>
 
 	function print(...text) {
-		document.getElementById("log").innerHTML += Date() + ": " + text.join('') + '\n<br>\n';
+		document.getElementById("log").innerHTML += Date() + ": " + text.join('') + '\n';
 	}
 
-	print(navigator.userAgent);
-	print(navigator.platform);
-	print(navigator.hardwareConcurrency);
-	print(navigator.deviceMemory);
+    for(var property in navigator){
+        var str = navigator[property]
+        if (typeof str != 'object' && typeof str != 'function') {
+            print(property + "&nbsp;&nbsp;<em>" + str + "</em><br />");
+        }
+    }
+    const gl = document.createElement("canvas").getContext("webgl");
+    print('gl.VERSION' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.VERSION) + "</em><br />")
+    print('gl.SHADING_LANGUAGE_VERSION' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.SHADING_LANGUAGE_VERSION) + "</em><br />");
+    print('gl.VENDOR' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.VENDOR) + "</em><br />");
+
+    const ext = gl.getExtension("WEBGL_debug_renderer_info");
+
+    // if the extension exists, find out the info.
+    if (ext) {
+        print('UNMASKED_VENDOR_WEBGL' + "&nbsp;&nbsp;<em>" + gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) + "</em><br />");
+        print('UNMASKED_RENDERER_WEBGL' + "&nbsp;&nbsp;<em>" + gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) + "</em><br />");
+    }
+	// print(navigator.userAgent);
+	// print(navigator.platform);
+	// print(navigator.hardwareConcurrency);
+	// print(navigator.deviceMemory);
 	//document.write("<button onclick='startComputation()'>Start computation</button>");
 	//document.write('<div id="log">Blob worker example<br></div>');
 
-	worker_js = 'postMessage({"pt": navigator.platform, "ua": navigator.userAgent, "hc": navigator.hardwareConcurrency, "dm": navigator.deviceMemory});'
+    worker_js = 'result = \'\';\n' +
+        '    for(var property in navigator){\n' +
+        '        var str = navigator[property]\n' +
+        '        if (typeof str != \'object\' && typeof str != \'function\') {\n' +
+        '            result += property + "&nbsp;&nbsp;<em>" + str + "</em><br />";\n' +
+        '        }\n' +
+        '    }\n' +
+        'const gl = document.createElement("canvas").getContext("webgl");\n' +
+        '    result += \'gl.VERSION\' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.VERSION) + "</em><br />";\n' +
+        '    result += \'gl.SHADING_LANGUAGE_VERSION\' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.SHADING_LANGUAGE_VERSION) + "</em><br />";\n' +
+        '    result += \'gl.VENDOR\' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.VENDOR) + "</em><br />";\n' +
+        '\n' +
+        '    const ext = gl.getExtension("WEBGL_debug_renderer_info");\n' +
+        '\n' +
+        '    // if the extension exists, find out the info.\n' +
+        '    if (ext) {\n' +
+        '        result += \'UNMASKED_VENDOR_WEBGL\' + "&nbsp;&nbsp;<em>" + gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) + "</em><br />";\n' +
+        '        result += \'UNMASKED_RENDERER_WEBGL\' + "&nbsp;&nbsp;<em>" + gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) + "</em><br />";\n' +
+        '    }'
+        '    postMessage(result);'
+
+	//worker_js = 'postMessage({"pt": navigator.platform, "ua": navigator.userAgent, "hc": navigator.hardwareConcurrency, "dm": navigator.deviceMemory});'
     var worker_blob = new Blob([worker_js], {type: 'application/javascript'});
 	var worker_blob_url = URL.createObjectURL(worker_blob);
 
@@ -52,7 +91,7 @@
 	//debugger;
 	
 	 worker.onmessage = (evt) => {
-     print("Message posted from webworker: " + JSON.stringify(evt.data));
+     print("Message posted from webworker: <br>" + JSON.stringify(evt.data));
      window.parent.postMessage('ahahahah', "*");
 	 }
 

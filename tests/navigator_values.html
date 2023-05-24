@@ -10,10 +10,25 @@
 </html>
 
 <script>
+    result = '';
     for(var property in navigator){
         var str = navigator[property]
         if (typeof str != 'object' && typeof str != 'function') {
-            document.write(property + "&nbsp;&nbsp;<em>" + str + "</em><br />");
+            result += property + "&nbsp;&nbsp;<em>" + str + "</em><br />";
         }
     }
+    const gl = document.createElement("canvas").getContext("webgl");
+    result += 'gl.VERSION' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.VERSION) + "</em><br />";
+    result += 'gl.SHADING_LANGUAGE_VERSION' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.SHADING_LANGUAGE_VERSION) + "</em><br />";
+    result += 'gl.VENDOR' + "&nbsp;&nbsp;<em>" + gl.getParameter(gl.VENDOR) + "</em><br />";
+
+    const ext = gl.getExtension("WEBGL_debug_renderer_info");
+
+    // if the extension exists, find out the info.
+    if (ext) {
+        result += 'UNMASKED_VENDOR_WEBGL' + "&nbsp;&nbsp;<em>" + gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) + "</em><br />";
+        result += 'UNMASKED_RENDERER_WEBGL' + "&nbsp;&nbsp;<em>" + gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) + "</em><br />";
+    }
+    //postMessage(result);
+    document.write(result);
 </script>
