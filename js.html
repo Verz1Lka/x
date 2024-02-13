@@ -44,5 +44,9 @@
            if(userVisited) {
                 showMessage("SUCCESS");
             }
+            else {
+                setCookie("userVisited", "true", 1);
+                window.location.reload();
+            }
         }
     </script>
