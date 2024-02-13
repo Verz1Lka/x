@@ -5,6 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JS Redirect Test</title>
+
+</head>
+<body>
+    <div id="message">IT'S A BAN [BROWSERLESS]</div>
+</body>
+</html>
     <script>
         function getCookie(name) {
             let cookieArr = document.cookie.split(";");
@@ -35,20 +41,8 @@
         window.onload = function() {
             let userVisited = getCookie("userVisited");
 
-           if(!userVisited) {
-                showMessage("IT'S BAN (BROWSERLESS)");
-                setCookie("userVisited", "true", 1);
-                // Делаем редирект на ту же страницу
-                setTimeout(function() {
-                    window.location.reload();
-                }, 1000); 
-            } else {
+           if(userVisited) {
                 showMessage("SUCCESS");
             }
         }
     </script>
-</head>
-<body>
-    <div id="message"></div>
-</body>
-</html>
