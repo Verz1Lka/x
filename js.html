@@ -30,6 +30,10 @@
             }
             document.cookie = name + "=" + (value || "")  + expires + "; path=/";
         }
+        function showMessage(message) {
+            // Находим элемент div по его ID и устанавливаем текст
+            document.getElementById("message").innerText = message;
+        }
 
         window.onload = function() {
             // Проверяем, установлен ли cookie
