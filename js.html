@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Redirect Test</title>
+    <script>
+        // Функция для чтения cookie
+        function getCookie(name) {
+            let cookieArr = document.cookie.split(";");
+            for(let i = 0; i < cookieArr.length; i++) {
+                let cookiePair = cookieArr[i].split("=");
+                if(name == cookiePair[0].trim()) {
+                    // Декодируем значение cookie и возвращаем его
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            // Возвращаем null, если cookie не найден
+            return null;
+        }
+
+        // Функция для установки cookie
+        function setCookie(name, value, hours) {
+            let expires = "";
+            if (days) {
+                let date = new Date();
+                date.setTime(date.getTime() + (hours*60*60*1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+        }
+
+        window.onload = function() {
+            // Проверяем, установлен ли cookie
+            let userVisited = getCookie("userVisited");
+
+           if(!userVisited) {
+                // Если cookie не установлен, показываем сообщение и устанавливаем cookie
+                showMessage("IT'S BAN (BROWSERLESS)");
+                setCookie("userVisited", "true", 1);
+                // Делаем редирект на ту же страницу
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000); // Задержка перед редиректом, чтобы пользователь успел увидеть сообщение
+            } else {
+                // Если cookie установлен, показываем сообщение SUCCESS
+                showMessage("SUCCESS");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="message"></div>
+</body>
+</html>
