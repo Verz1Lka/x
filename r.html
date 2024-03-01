@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <script type="text/javascript">
+        // Парсинг параметров URL
+        function getQueryParam(name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+
+        // Выполнение редиректа
+        function redirectToUrl() {
+            var urlParam = getQueryParam("url");
+            if (urlParam) {
+                window.location.href = urlParam;
+            } else {
+                console.error("URL parameter not found.");
+                // Здесь можно добавить редирект на страницу по умолчанию или показать сообщение об ошибке
+            }
+        }
+
+        // Вызов функции редиректа при загрузке страницы
+        window.onload = redirectToUrl;
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Redirect Test</title>
+
+</head>
+<body>
+    <div id="message">IT'S A BAN [BROWSERLESS]</div>
+</body>
+</html>
+    <script>
+        function getCookie(name) {
+            let cookieArr = document.cookie.split(";");
+            for(let i = 0; i < cookieArr.length; i++) {
+                let cookiePair = cookieArr[i].split("=");
+                if(name == cookiePair[0].trim()) {
+
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            // Возвращаем null, если cookie не найден
+            return null;
+        }
+
+        function setCookie(name, value, hours) {
+            let expires = "";
+            if (hours) {
+                let date = new Date();
+                date.setTime(date.getTime() + (hours*60*60*1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+        }
+        function showMessage(message) {
+            document.getElementById("message").innerText = message;
+        }
+
+        window.onload = function() {
+            let userVisited = getCookie("userVisited");
+
+           if(userVisited) {
+                showMessage("SUCCESS");
+            }
+            else {
+                setCookie("userVisited", "true", 1);
+                window.location.reload();
+            }
+        }
+    </script>
