@@ -1,0 +1,14 @@
+<pre id="x" style="word-wrap: break-word; white-space: pre-wrap;"></pre>
+<script>
+    const data = [];
+    w = new Worker("dd_int.js");
+
+    w.addEventListener("message", (event) => {
+        console.log(event.data);
+        const x = document.getElementById("x");
+        data.push(event.data);
+        x.textContent = JSON.stringify(data, undefined, 2);
+        //console.log(`Received message from worker: ${event.data}`);
+    });
+    w.postMessage({'is': 1})
+</script>
