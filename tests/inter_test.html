@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<pre id="payload"></pre>
+<body>
+
+
+
+
+<pre id="response"></pre>
+
+
+<script>
+    var ddm = {
+        seed:  'de999eff-9686-c850-1fdb-a8de50e61a8c' ,
+        cid:  'S6ak9DbnXcdHnAFwqDFQx1TqYqZujRMXX7RQFM2uyBFi4YuSi515Mssc0lldolw2eVNCh0Nem3plLNA~Tv~84cjAgZeo1vZBmk4zfu1TFH45sD5XCoVhUAQ_XbKMJxfg' ,
+        hash:  '36C95FCC733A6BF92F5AC434FF65D7' ,
+        env:  'f0e6b11901a6966f3e03dc4a05b0f2f9502eb4ecbd425f1813edbc850d7508d64d5adeab823175e7a54885973bbe599267fa1bfc555fb51ad43ab6afc1ca93f1' ,
+        url:  'https://www.lacentrale.fr/auto-occasion-annonce-66102471238.html' ,
+        b: 1359015,
+        s: 26576,
+        durationMs: 2000,
+        displayEnabled: true,
+        i18n: {
+            l_device_check_restart_verification_hidden :  'Перезапустить проверку вашего устройства'
+        }
+    };
+    var ddresx = {};
+
+    /* DataDome is a cybersecurity solution to detect bot activity @license https://datadome.co v1.10.0 28c5d8e */
+</script>
+
+<script src="interstitial.js"></script>
+
+<script>
+
+    var referer =  'https://www.lacentrale.fr/auto-occasion-annonce-66102471238.html' ;
+    var resElement = new DOMParser().parseFromString(referer, 'text/html');
+    if (resElement) {
+        ddm.referer = resElement.documentElement.textContent;
+    } else {
+        ddm.referer = referer;
+    }
+
+    var interstitial = interstitialChallenge();
+
+    var successElt = document.getElementById("device-check__ok");
+    var errorElt = document.getElementById("device-check__ko");
+    var spinnerElt = document.getElementById("device-check__loading");
+
+    var onSuccess = function(display) {
+        if (display) {
+            // hide loading and show success icon
+            spinnerElt.classList.add("device-check__hidden");
+            successElt.classList.remove("device-check__hidden");
+        }
+    }
+    var onError = function(display) {
+        if (display) {
+            // hide loading and show error icon
+            spinnerElt.classList.add("device-check__hidden");
+            errorElt.classList.remove("device-check__hidden");
+        }
+    }
+
+    window.interstitialCallback = function (payload, cb) {
+        var body = 'payload=' + encodeURIComponent(payload)
+            + '&cid=' + encodeURIComponent(ddm.cid)
+            + '&hash=' + encodeURIComponent(ddm.hash)
+            + '&referer=' + encodeURIComponent(ddm.referer)
+            + '&url=' + encodeURIComponent(ddm.url)
+            + '&s=' + ddm.s
+            + '&env=' + encodeURIComponent(ddm.env)
+            + '&seed=' + encodeURIComponent(ddm.seed)
+            + '&b=' + ddm.b;
+
+        var onload = function () {
+            // process response
+            if (this.status >= 200 && this.status < 400 && this.responseText !== undefined) {
+                var json = JSON.parse(this.responseText);
+                document.getElementById('response').innerText = json;
+                if (json.view == 'redirect') {
+                    onSuccess(ddm.displayEnabled);
+                    if (window.parent && window.parent.postMessage) {
+                        window.parent.postMessage(JSON.stringify({'url': json.url, 'cookie': json.cookie, 'eventType': 'passed', 'responseType': 'devicecheck'}), '*');
+                    } else {
+                        //window.top.location = json.url;
+                    }
+
+                    // to prevent race condition with postMessage that should setup a cookie
+                    // adds some sleep for refresh logic
+                    setTimeout(function () {
+                        if (window.android
+                            && window.android.onCaptchaSuccess) {
+                            window.android.onCaptchaSuccess(json.cookie);
+                            return;
+                        }
+                        if (window.webkit
+                            && window.webkit.messageHandlers
+                            && window.webkit.messageHandlers.onCaptchaSuccess
+                            && window.webkit.messageHandlers.onCaptchaSuccess.postMessage) {
+                            window.webkit.messageHandlers.onCaptchaSuccess.postMessage(json.cookie);
+                            return;
+                        }
+                        if (window.ReactNativeWebView
+                            && window.ReactNativeWebView.postMessage) {
+                            window.ReactNativeWebView.postMessage(json.cookie);
+                        }
+                    }, 500);
+                } else if (json.view == 'captcha') {
+                    onError(ddm.displayEnabled);
+                    window.location = json.url;
+                }
+            } else {
+                onError(ddm.displayEnabled);
+            }
+        };
+
+        var request = new XMLHttpRequest();
+        request.open('POST', '/interstitial/', true);
+        //request.open('POST', 'https://geo.captcha-delivery.com/interstitial/', true);
+        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        document.getElementById('payload').innerText = JSON.stringify(window.ddresx, null, 2);
+        if (cb) {
+            cb(request, body, onload);
+        } else {
+            request.onload = onload;
+            request.send(body);
+        }
+    };
+
+    interstitial.sendPayload();
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.parent && window.parent.postMessage){
+            window.parent.postMessage(JSON.stringify({'eventType':'load', 'responseType': 'devicecheck', 'responseUrl': window.location.href}), '*');
+        }
+    });
+
+</script>
+</body>
+
+</html>
