@@ -1,7 +1,8 @@
 
 <!DOCTYPE html>
 <html lang="ru">
-<pre id="payload"></pre>
+<pre id="payload_f"></pre>
+
 <body>
 
 
@@ -120,7 +121,8 @@
         request.open('POST', '/interstitial/', true);
         //request.open('POST', 'https://geo.captcha-delivery.com/interstitial/', true);
         request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        document.getElementById('payload').innerText = JSON.stringify(window.ddresx, null, 2);
+        document.getElementById('payload_f').innerText = JSON.stringify(window.ddresx, null, 2);
+        document.getElementById('payload').innerText = JSON.stringify(window.ddresx);
         if (cb) {
             cb(request, body, onload);
         } else {
@@ -139,5 +141,5 @@
 
 </script>
 </body>
-
 </html>
+<pre id="payload"></pre>
