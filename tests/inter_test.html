@@ -1,13 +1,79 @@
 
 <!DOCTYPE html>
 <html lang="ru">
-<pre id="payload_f"></pre>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex">
+    <title>Device check
+    </title>
+
+    <link href="https://static.captcha-delivery.com/common/fonts/roboto/font-face.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://static.captcha-delivery.com/captcha/assets/tpl/device-check/index.css" />
+
+
+    <style>
+        /* General font handling */
+        *, *::before, *::after {
+            font-family : Roboto, Verdana, Arial;
+            font-weight : 400;
+            color       : #000000;
+        }
+
+        :root {
+            --device-check-spinner-color-1: #17cdda;
+            --device-check-spinner-color-2: #17bbf4;
+        }
+
+
+    </style>
+</head>
 
 <body>
 
 
 
+<div class="device-check__header">
+    <div class="device-check__header__logo-wrapper">
+        <img src="https://static.captcha-delivery.com/captcha/assets/set/1ced0c5c3da65a3201797b6e51cff5fc7b3b01b0/logo.png?update_cache=-8883298443587361764" class="device-check__header__logo"
+        />
+    </div>
 
+    <h1 class="title">Проверка устройства ...</h1>
+
+    <div id="device-check__loading" class="device-check__spinner-wrapper">
+        <div class="device-check__spinner">
+            <div class="device-check__spinner-1"></div>
+            <div class="device-check__spinner-2"></div>
+        </div>
+    </div>
+
+    <div id="device-check__ok" class="device-check__checkmark-wrapper device-check__hidden" role="status">
+        <div class="device-check__circle device-check__green-circle">
+            <div class="device-check__success"><span class="visually-hidden">Проверка успешно</span></div>
+        </div>
+    </div>
+
+    <div id="device-check__ko" class="device-check__checkmark-wrapper device-check__hidden" role="alert">
+        <div class="device-check__circle device-check__red-circle">
+            <div class="device-check__error"><span class="visually-hidden">Проверка не удалась</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="device-check__main">
+    <p class="device-check__main__message">
+        Запрашиваемый контент будет доступен после проверки.<br />
+    </p>
+</div>
+
+<div class="device-check__footer">
+
+</div>
+
+<pre id="payload_f"></pre>
 <pre id="response"></pre>
 
 
