@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .font-list {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Detected Fonts</h1>
+<div>
+    <h2>List 1 Fonts:</h2>
+    <div id="detectedFontsList1" class="font-list"></div>
+    <h2>List 2 Fonts:</h2>
+    <div id="detectedFontsList2" class="font-list"></div>
+</div>
+
+<script>
+    const BASE_FONTS = ["monospace", "sans-serif", "serif"];
+    const TEST_STRING = "mmmmmmmmlli";
+    const FONT_SIZE = "72px";
+    const THRESHOLD = 0.1;
+
+    const isSimilarSize = (size1, size2) => Math.abs(size1 - size2) < THRESHOLD;
+
+    const measureText = (font) => {
+        const canvas = document.createElement("canvas").getContext("2d");
+        canvas.font = font;
+        return canvas.measureText(TEST_STRING);
+    };
+
+    const detectFonts = (fontsToCheck) => {
+        const baseFontMeasurements = BASE_FONTS.map(fontFamily => ({
+            fontFamily,
+            measurement: measureText(`${FONT_SIZE} ${fontFamily}`)
+        }));
+
+        return fontsToCheck.filter(fontToCheck => {
+            return baseFontMeasurements.some(({ fontFamily, measurement }) => {
+                const testFont = `${FONT_SIZE} ${fontToCheck}, ${fontFamily}`;
+                const testMeasurement = measureText(testFont);
+                return !isSimilarSize(testMeasurement.width, measurement.width);
+            });
+        });
+    };
+
+    const displayDetectedFonts = (detectedFonts, elementId) => {
+        const element = document.getElementById(elementId);
+        if (detectedFonts.length > 0) {
+            detectedFonts.forEach(font => {
+                const fontElement = document.createElement('div');
+                fontElement.textContent = font;
+                element.appendChild(fontElement);
+            });
+        } else {
+            element.textContent = 'No fonts detected.';
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const FONTS_TO_CHECK_INC = ["ARNOPRO", "AgencyFB", "ArabicTypesetting", "ArialUnicodeMS", "AvantGardeBkBT", "BankGothicMdBT", "Batang", "BitstreamVeraSansMono", "Calibri", "Century", "CenturyGothic", "Clarendon", "EUROSTILE", "FranklinGothic", "FuturaBkBT", "FuturaMdBT", "GOTHAM", "GillSans", "HELV", "Haettenschweiler", "HelveticaNeue", "Humanst521BT", "Leelawadee", "LetterGothic", "LevenimMT", "LucidaBright", "LucidaSans", "MSMincho", "MSOutlook", "MSReferenceSpecialty", "MSUIGothic", "MTExtra", "MYRIADPRO", "Marlett", "MeiryoUI", "MicrosoftUighur", "MinionPro", "MonotypeCorsiva", "PMingLiU", "Pristina", "SCRIPTINA", "SegoeUILight", "Serifa", "SimHei", "SmallFonts", "Staccato222BT", "TRAJANPRO", "UniversCE55Medium", "Vrinda", "ZWAdobeF"];
+        const FONTS_TO_CHECK_EXT = ["Arial","Verdana","Times New Roman","Georgia","Courier New","Ubuntu","DejaVu Sans","Liberation Serif","Consolas","Helvetica","San Francisco","Menlo","Segoe UI","Calibri","Roboto","Open Sans","Poppins","Montserrat","Lora","Muli","Raleway","Oswald","Quicksand","Nunito","Source Sans Pro","PT Sans","Fira Sans","Karla","Museo Sans","Playfair Display","Merriweather","Vollkorn","Roboto Slab","Aldrich","Avenir","Baskerville","Bodoni","Cambria","Candara","Cardo","Charter","Corbel","Didot","DIN","Eurostile","Futura","Garamond","Gill Sans","Goudy Old Style","Helvetica Neue","Hoefler Text","Impact","Jost","Kaufmann","Khand","Lato","Libre Baskerville","Libre Franklin","Lora","Lucida","Maiden Orange","Mate SC","Merriweather","Minion Pro","Museo Slab","Myriad Pro","Neutra","News Gothic","Noto Sans","Nunito","Oswald","Palatino","Patua One","Playfair Display","Poppins","PT Sans","Quicksand","Raleway","Roboto","Roboto Condensed","Roboto Slab","Rockwell","Rubik","Sabon","Saira","Sanchez","Satisfy","Sawyer","Serif","Source Sans Pro","Spectral","Tahoma","Titillium Web","Trajan Pro","Ubuntu","Vollkorn","Work Sans"]
+
+        const detectedFontsList1 = detectFonts(FONTS_TO_CHECK_INC);
+        const detectedFontsList2 = detectFonts(FONTS_TO_CHECK_EXT);
+
+        displayDetectedFonts(detectedFontsList1, 'detectedFontsList1');
+        displayDetectedFonts(detectedFontsList2, 'detectedFontsList2');
+    });
+</script>
+</body>
+</html>
