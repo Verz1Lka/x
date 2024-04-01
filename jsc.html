@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Динамическое Сравнение Объектов</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .object-container { margin-bottom: 20px; position: relative; }
+    textarea { width: 100%; height: 150px; } /* Увеличили ширину */
+    input[type="text"], button { margin-bottom: 10px; }
+    .remove-btn {
+      position: absolute; top: 0; right: 0;
+      background-color: red; color: white; border: none; cursor: pointer;
+    }
+    /* Стилизация контейнера объектов для красивого отображения */
+    #objectsContainer { display: flex; flex-direction: column; gap: 10px; }
+  </style>
+  <style>
+    .difference {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<div id="objectsContainer">
+  <div class="object-container">
+    <input type="text" class="label-input" placeholder="Метка объекта">
+    <h2>Объект (JSON)</h2>
+    <textarea class="json-input"></textarea>
+    <button class="remove-btn" onclick="removeObject(this)">Удалить</button>
+  </div>
+
+</div>
+<button onclick="addObject()">Добавить Объект</button>
+<div class="container">
+  <h2>Игнорируемые ключи (через запятую)</h2>
+  <input type="text" id="ignoreKeys" style="width: 98%;"/> <!-- Увеличенная ширина -->
+</div>
+<button onclick="compareObjects()">Сравнить Объекты</button>
+<h2>Результаты Сравнения:</h2>
+<pre id="result"></pre>
+
+<script>
+  function findDifferencesAmongObjects(objects, ignoreKeys = []) {
+    let allKeys = new Set();
+    objects.forEach(obj => {
+      Object.keys(obj).forEach(key => allKeys.add(key));
+    });
+
+    let differences = {};
+
+    // Функция для добавления/обновления различий
+    function updateDifference(key, objIndex, value) {
+      if (!ignoreKeys.includes(key)) {
+        if (!differences[key]) {
+          differences[key] = Array(objects.length).fill(undefined); // Инициализация
+        }
+        differences[key][objIndex] = value;
+      }
+    }
+
+    allKeys.forEach(key => {
+      let isDifferent = false;
+      let firstValue = objects[0].hasOwnProperty(key) ? JSON.stringify(objects[0][key]) : undefined;
+      for (let i = 1; i < objects.length; i++) {
+        let value = objects[i].hasOwnProperty(key) ? JSON.stringify(objects[i][key]) : undefined;
+        if (firstValue !== value) {
+          isDifferent = true;
+          break;
+        }
+      }
+
+      if (isDifferent) {
+        objects.forEach((obj, index) => {
+          updateDifference(key, index, obj[key]);
+        });
+      }
+    });
+
+    return differences;
+  }
+
+  function saveToLocalStorage() {
+    const jsonInputs = document.querySelectorAll('.json-input');
+    const labelInputs = document.querySelectorAll('.label-input');
+    const objects = Array.from(jsonInputs).map(input => input.value);
+    const labels = Array.from(labelInputs).map(input => input.value);
+
+    const objectsData = { objects, labels };
+    localStorage.setItem('objectsData', JSON.stringify(objectsData));
+
+    const ignoreKeys = document.getElementById('ignoreKeys').value;
+    localStorage.setItem('ignoreKeys', ignoreKeys);
+  }
+
+  // Функция для восстановления объектов и игнорируемых ключей из localStorage
+  function restoreFromLocalStorage() {
+    const savedData = JSON.parse(localStorage.getItem('objectsData')) || { objects: [], labels: [] };
+
+    document.getElementById('ignoreKeys').value = localStorage.getItem('ignoreKeys') || '';
+
+    const container = document.getElementById('objectsContainer');
+    container.innerHTML = '';
+
+    if (savedData.objects.length === 0) {
+      addObject();
+      addObject();
+    } else {
+      savedData.objects.forEach((obj, index) => {
+        addObject(savedData.labels[index]);
+        container.lastElementChild.querySelector('.json-input').value = obj;
+      });
+    }
+  }
+
+
+  function addObject(label = '') {
+    const container = document.getElementById('objectsContainer');
+    const objectCount = container.getElementsByClassName('object-container').length + 1;
+    const objectContainer = document.createElement('div');
+    objectContainer.className = 'object-container';
+    objectContainer.innerHTML = `
+    <input type="text" class="label-input" placeholder="Метка объекта ${objectCount}" value="${label}">
+    <h2>Объект ${objectCount} (JSON)</h2>
+    <textarea class="json-input"></textarea>
+    <button class="remove-btn" onclick="removeObject(this)">Удалить</button>
+  `;
+    container.appendChild(objectContainer);
+  }
+
+  function removeObject() {
+    const container = document.getElementById('objectsContainer');
+    const objectCount = container.getElementsByClassName('object-container').length;
+    if (objectCount > 2) {
+      container.removeChild(container.lastElementChild);
+    } else {
+      alert('Должно быть как минимум два объекта для сравнения.');
+    }
+    button.parentElement.remove();
+  }
+
+  function highlightDifferences(str1, str2) {
+    let maxLength = Math.max(str1.length, str2.length);
+    let result = '';
+
+    for (let i = 0; i < maxLength; i++) {
+      if (str1[i] !== str2[i]) {
+        result += `<span class="difference">${str1[i] || ''}</span>`;
+      } else {
+        result += str1[i] || '';
+      }
+    }
+
+    return result;
+  }
+
+  function compareObjects() {
+    try {
+      const jsonInputs = document.querySelectorAll('.json-input');
+      const objects = Array.from(jsonInputs).map(input => JSON.parse(input.value));
+      const ignoreKeys = document.getElementById('ignoreKeys').value.split(',').map(key => key.trim());
+
+      const differences = findDifferencesAmongObjects(objects, ignoreKeys);
+      document.getElementById('result').textContent = JSON.stringify(differences, null, 2);
+    } catch (e) {
+      document.getElementById('result').textContent = 'Ошибка при анализе данных: ' + e.message;
+    }
+    saveToLocalStorage();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    addObject();
+    addObject();
+    restoreFromLocalStorage();
+  });
+
+  function highlightDifferences(str1, str2) {
+    // Подсветка различий между двумя строками
+    let result = "";
+    let maxLength = Math.max(str1.length, str2.length);
+
+    for (let i = 0; i < maxLength; i++) {
+      let char1 = str1[i] || "";
+      let char2 = str2[i] || "";
+      if (char1 !== char2) {
+        result += `<span class="difference">${char1}</span>`;
+      } else {
+        result += char1;
+      }
+    }
+    return result;
+  }
+
+
+  // Функция findDifferencesAmongObjects, предоставленная ранее
+
+</script>
+
+</body>
+</html>
