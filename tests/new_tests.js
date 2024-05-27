@@ -1,14 +1,10 @@
-// NEW TESTS
-// Copy Right - Nikolai Tschacher - incolumitas.com
-// January 2021
-
 var new_results = {};
 
 const uaParsed = UAParser(navigator.userAgent);
 const browserName = uaParsed.browser.name;
 const majorVersion = uaParsed.browser.major;
 
-fetch('https://abs.incolumitas.com/get') // fetch http headers dynamically
+fetch('https://us-central1-uncork-dev.cloudfunctions.net/client-hints?json=1') // fetch http headers dynamically
   .then(response => response.json())
   .then(function(data) {
     // 1. Test inconsistentUserAgent:
