@@ -1,18 +1,19 @@
 
-          function compareNavigatorProperties(obj, test) {
-            var propertiesToCheck = [
-              'userAgent',
-              'appVersion',
-              'platform',
-              // 'webdriver',
-              'deviceMemory',
-              'hardwareConcurrency',
-              'cpuClass',
-              // 'vendor',
-              'language',
-              'languages'
-            ];
-            passed = true;
+function compareNavigatorProperties(obj, test) {
+  let passed;
+  let propertiesToCheck = [
+    'userAgent',
+    'appVersion',
+    'platform',
+    // 'webdriver',
+    'deviceMemory',
+    'hardwareConcurrency',
+    'cpuClass',
+    // 'vendor',
+    'language',
+    'languages'
+  ];
+  passed = true;
             new_results[test] = 'PASSED';
             for (let prop of propertiesToCheck) {
               let toTest = obj[prop];
@@ -79,7 +80,21 @@
             }
           }
 
-          var navigatorData = {
+const webGlData = {};
+var canvas = new OffscreenCanvas(1, 1);
+const gl = canvas.getContext("webgl");
+webGlData['gl.VERSION'] =  gl.getParameter(gl.VERSION);
+webGlData['gl.SHADING_LANGUAGE_VERSION']= gl.getParameter(gl.SHADING_LANGUAGE_VERSION) ;
+webGlData['gl.VENDOR'] = gl.getParameter(gl.VENDOR);
+
+const ext = gl.getExtension("WEBGL_debug_renderer_info");
+
+if (ext) {
+  webGlData['UNMASKED_VENDOR_WEBGL'] = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL);
+  webGlData['UNMASKED_RENDERER_WEBGL'] = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+}
+
+var navigatorData = {
   userAgent: navigator.userAgent,
   appVersion: navigator.appVersion,
   platform: navigator.platform,
@@ -90,7 +105,9 @@
   vendor: navigator.vendor,
   language: navigator.language,
   languages: navigator.languages,
-  userAgentData: navigator.userAgentData
+  userAgentData: navigator.userAgentData,
+  webGlData: webGlData
 }
+
 document.getElementById('navigatorRes').innerHTML = JSON.stringify(navigatorData, null, 2);
     
