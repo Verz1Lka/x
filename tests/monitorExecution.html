@@ -1,0 +1,12 @@
+<span id="1"></span>
+<br>
+<span id="2"></span>
+<script src="monitorExecution.js"></script>
+
+<script>
+    fingerprintingDetection();
+    setTimeout(() => {
+        document.getElementById('1').innerHTML = JSON.stringify(navigator.monitorFingerprinting, null, 2)
+    }, 1000);
+    document.getElementById('2').innerHTML = navigator.fpTestErr;
+</script>

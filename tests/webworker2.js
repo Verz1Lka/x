@@ -17,7 +17,7 @@ var workerData = {
   platform: navigator.platform,
   webdriver: navigator.webdriver,
   deviceMemory: navigator.deviceMemory,
-	hardwareConcurrency: navigator.hardwareConcurrency,
+  hardwareConcurrency: navigator.hardwareConcurrency,
   cpuClass: navigator.cpuClass,
   vendor: navigator.vendor,
   language: navigator.language,
@@ -27,7 +27,21 @@ var workerData = {
 }
 
 postMessage(JSON.stringify(workerData, null, 2));
+//
+// // main page
+// w = new Worker("webworker2.js");
+// w.onmessage = function(event) {
+//   let obj = JSON.parse(event.data);
+//   document.getElementById("webWorkerRes").innerHTML = event.data;
+// };
 
 // setTimeout(() => {
 //   postMessage(JSON.stringify(workerData, null, 2));
 // }, 100);
+
+
+// const iframe = document.createElement('iframe');
+// document.body.appendChild(iframe);
+// iframeNavigator = iframe.contentWindow.navigator;
+// document.body.removeChild(iframe);
+// alert(iframeNavigator.platform);
