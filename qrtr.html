@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payload Decoder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group textarea,
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            height: 200px;
+        }
+        .form-group input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-group input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Payload Decoder</h1>
+    <form id="decodeForm">
+        <div class="form-group">
+            <label for="payload">Payload:</label>
+            <textarea id="payload" name="payload"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="jsc_cookie">Cookie:</label>
+            <input type="text" id="jsc_cookie" name="jsc_cookie">
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Decode">
+        </div>
+    </form>
+    <div class="result" id="result"></div>
+</div>
+<script>
+    document.getElementById('decodeForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const payload = document.getElementById('payload').value;
+        const jsc_cookie = document.getElementById('jsc_cookie').value;
+
+        const data = { payload, jsc_cookie };
+
+        fetch('https://fx4.ru/q', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').textContent = 'Error decoding payload.';
+            });
+    });
+</script>
+</body>
+</html>
