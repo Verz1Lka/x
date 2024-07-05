@@ -72,8 +72,8 @@
             <textarea id="payload" name="payload"></textarea>
         </div>
         <div class="form-group">
-            <label for="jsc_cookie">Cookie:</label>
-            <input type="text" id="jsc_cookie" name="jsc_cookie">
+            <label for="jsr_cookie">Cookie:</label>
+            <input type="text" id="jsr_cookie" name="jsr_cookie">
         </div>
         <div class="form-group">
             <input type="submit" value="Decode">
@@ -85,10 +85,10 @@
     document.getElementById('decodeForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const payload = document.getElementById('payload').value;
-        const jsc_cookie = document.getElementById('jsc_cookie').value;
+        const payload = JSON.parse(document.getElementById('payload').value);
+        const jsr_cookie = document.getElementById('jsr_cookie').value;
 
-        const data = { payload, jsc_cookie };
+        const data = { payload, jsr_cookie };
 
         fetch('https://xf4.ru/q', {
             method: 'POST',
