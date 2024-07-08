@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html>
+
+<div id="captcha-container" class="captcha" >
+    <div class="captcha__human" style="padding: 0;">
+        </div>
+    </div>
+    <div id="ddv1-captcha-container">
+    </div>
+</div>
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        var ddm = {};
+        var _lol_fp = {};
+
+    </script>
+    <script type="text/javascript" src="1.9.9.js"></script>
+</head>
+<body>
+<pre id="results"></pre>
+<script>
+
+    var captcha = sliderCaptcha({
+        id: 'ddv1-captcha-container',
+        audioId: 'captcha__audio',
+        repeatIcon: 'fa fa-redo',
+        captchaChallengeSeed: '',
+        captchaChallengePath: './1.jpg',
+        captchaAudioChallenge: './1',
+        captchaAudioChallengePath: './1.wav',
+        width: 280,
+        height: 155,
+        sliderL: 42,
+        sliderR: 9,
+        offset: 5.0,
+        maxLoadCount: 3,
+        rt: 15,
+        imagePath: "/images-encoded",
+        labels: {
+            title: 'Введите CAPTCHA.',
+            puzzleLoading: 'Идет загрузка...',
+            puzzleIntro: 'Смахните вправо, чтобы заполнить головоломку.',
+            puzzleFailure: 'Неправильное положение ползунка.',
+            puzzleSuccess: 'Головоломка решена за ## секунд.',
+            puzzleRetry: 'Повторить попытку',
+            audioIntro: 'Введите цифры, которые вы слышите.',
+            audioPlay: 'Воспроизвести',
+            audioVerify: 'Проверить',
+            audioFailure: 'Ответ неверный.',
+            audioSuccess: 'Аудиозадача решена.',
+            switchToPuzzle: 'Переключиться на тест CAPTCHA с изображениями.',
+            switchToAudio: 'Переключиться на звуковой тест CAPTCHA.',
+            reload: 'Перезагрузить CAPTCHA.'
+        }
+    });
+
+    setTimeout(function() {
+        var results = document.getElementById('results');
+        if (results) {
+            results.innerHTML = JSON.stringify(_lol_fp, null, 2);
+            document.getElementById('ddv1-captcha-container').remove();
+        }
+        //document.write(JSON.stringify(_lol_fp));
+    }, 3000);
+</script>
+</body>
+</html>
