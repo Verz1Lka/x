@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Font Detection</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .font-list {
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
 <pre id="results"></pre>
@@ -47,12 +38,31 @@
     };
 
     document.addEventListener('DOMContentLoaded', function () {
-        const FONTS_TO_CHECK_INC = ["ARNOPRO", "AgencyFB", "ArabicTypesetting", "ArialUnicodeMS", "AvantGardeBkBT", "BankGothicMdBT", "Batang", "BitstreamVeraSansMono", "Calibri", "Century", "CenturyGothic", "Clarendon", "EUROSTILE", "FranklinGothic", "FuturaBkBT", "FuturaMdBT", "GOTHAM", "GillSans", "HELV", "Haettenschweiler", "HelveticaNeue", "Humanst521BT", "Leelawadee", "LetterGothic", "LevenimMT", "LucidaBright", "LucidaSans", "MSMincho", "MSOutlook", "MSReferenceSpecialty", "MSUIGothic", "MTExtra", "MYRIADPRO", "Marlett", "MeiryoUI", "MicrosoftUighur", "MinionPro", "MonotypeCorsiva", "PMingLiU", "Pristina", "SCRIPTINA", "SegoeUILight", "Serifa", "SimHei", "SmallFonts", "Staccato222BT", "TRAJANPRO", "UniversCE55Medium", "Vrinda", "ZWAdobeF"];
-        const FONTS_TO_CHECK_EXT = ["Arial","Verdana","Times New Roman","Georgia","Courier New","Ubuntu","DejaVu Sans","Liberation Serif","Consolas","Helvetica","San Francisco","Menlo","Segoe UI","Calibri","Roboto","Open Sans","Poppins","Montserrat","Lora","Muli","Raleway","Oswald","Quicksand","Nunito","Source Sans Pro","PT Sans","Fira Sans","Karla","Museo Sans","Playfair Display","Merriweather","Vollkorn","Roboto Slab","Aldrich","Avenir","Baskerville","Bodoni","Cambria","Candara","Cardo","Charter","Corbel","Didot","DIN","Eurostile","Futura","Garamond","Gill Sans","Goudy Old Style","Helvetica Neue","Hoefler Text","Impact","Jost","Kaufmann","Khand","Lato","Libre Baskerville","Libre Franklin","Lora","Lucida","Maiden Orange","Mate SC","Merriweather","Minion Pro","Museo Slab","Myriad Pro","Neutra","News Gothic","Noto Sans","Nunito","Oswald","Palatino","Patua One","Playfair Display","Poppins","PT Sans","Quicksand","Raleway","Roboto","Roboto Condensed","Roboto Slab","Rockwell","Rubik","Sabon","Saira","Sanchez","Satisfy","Sawyer","Serif","Source Sans Pro","Spectral","Tahoma","Titillium Web","Trajan Pro","Ubuntu","Vollkorn","Work Sans"]
-        const FONTS_TO_CHECK_D = ["Sego UI", "Calibri", "Cambria", "Tahoma", "Palatino", "San Francisco", "Helvetica Neue",
-            "Apple SD Gothic Neo", "SF Compact Display", "Liberation Sans", "DejaVu Sans", "ubuntu",
+        const FONTS_TO_CHECK_INC = ["ARNOPRO", "AgencyFB", "ArabicTypesetting", "ArialUnicodeMS", "AvantGardeBkBT",
+            "BankGothicMdBT", "Batang", "BitstreamVeraSansMono", "Calibri", "Century", "CenturyGothic", "Clarendon",
+            "EUROSTILE", "FranklinGothic", "FuturaBkBT", "FuturaMdBT", "GOTHAM", "GillSans", "HELV", "Haettenschweiler",
+            "HelveticaNeue", "Humanst521BT", "Leelawadee", "LetterGothic", "LevenimMT", "LucidaBright", "LucidaSans",
+            "MSMincho", "MSOutlook", "MSReferenceSpecialty", "MSUIGothic", "MTExtra", "MYRIADPRO", "Marlett",
+            "MeiryoUI", "MicrosoftUighur", "MinionPro", "MonotypeCorsiva", "PMingLiU", "Pristina", "SCRIPTINA",
+            "SegoeUILight", "Serifa", "SimHei", "SmallFonts", "Staccato222BT", "TRAJANPRO", "UniversCE55Medium",
+            "Vrinda", "ZWAdobeF"];
+
+        const FONTS_TO_CHECK_EXT = ["Arial","Verdana","Times New Roman","Georgia","Courier New","Ubuntu","DejaVu Sans",
+            "Liberation Serif","Consolas","Helvetica","San Francisco","Menlo","Segoe UI","Calibri","Roboto","Open Sans",
+            "Poppins","Montserrat","Lora","Muli","Raleway","Oswald","Quicksand","Nunito","Source Sans Pro","PT Sans",
+            "Fira Sans","Karla","Museo Sans","Playfair Display","Merriweather","Vollkorn","Roboto Slab","Aldrich",
+            "Avenir","Baskerville","Bodoni","Cambria","Candara","Cardo","Charter","Corbel","Didot","DIN","Eurostile",
+            "Futura","Garamond","Gill Sans","Goudy Old Style","Helvetica Neue","Hoefler Text","Impact","Jost",
+            "Kaufmann","Khand","Lato","Libre Baskerville","Libre Franklin","Lora","Lucida","Maiden Orange","Mate SC",
+            "Merriweather","Minion Pro","Museo Slab","Myriad Pro","Neutra","News Gothic","Noto Sans","Nunito","Oswald",
+            "Palatino","Patua One","Playfair Display","Poppins","PT Sans","Quicksand","Raleway","Roboto",
+            "Roboto Condensed","Roboto Slab","Rockwell","Rubik","Sabon","Saira","Sanchez","Satisfy","Sawyer","Serif",
+            "Source Sans Pro","Spectral","Tahoma","Titillium Web","Trajan Pro","Ubuntu","Vollkorn","Work Sans"];
+
+        const FONTS_TO_CHECK_D = ["Sego UI", "Calibri", "Cambria", "Tahoma", "Palatino", "San Francisco",
+            "Helvetica Neue", "Apple SD Gothic Neo", "SF Compact Display", "Liberation Sans", "DejaVu Sans", "ubuntu",
             "Roboto", "Noto Sans", "Droid Sans", "Product Sans", "SimSun", "Microsoft YaHei", "Songti",
-            "Kaiti", "PingFang", "Heiti", "SimHei", "PT Sans"]
+            "Kaiti", "PingFang", "Heiti", "SimHei", "PT Sans"];
 
 
         const detectedFontsList1 = detectFonts(FONTS_TO_CHECK_INC);
@@ -64,8 +74,6 @@
             ext: detectedFontsList2,
             d: detectedFontsList3
         }
-
-        //document.write(JSON.stringify(data));
 
         const results = document.getElementById('results');
         if (results) {
