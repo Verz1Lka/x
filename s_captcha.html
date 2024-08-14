@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Rotation and Positioning</title>
+    <style>
+        #container {
+            position: relative;
+            width: 280px; /* Ширина большого изображения */
+            height: 140px; /* Высота большого изображения */
+            margin: 50px auto;
+            border: 1px solid #ccc;
+            overflow: hidden;
+        }
+        #largeImage {
+            width: 100%;
+            height: 100%;
+        }
+        #smallImage {
+            position: absolute;
+            width: 53px; /* Ширина малого изображения */
+            height: auto;
+            top: 0px; /* Центрирование по вертикали */
+        }
+        #j0 {
+            width: 100%; /* Увеличение ширины ползунка */
+            max-width: 300px; /* Максимальная ширина ползунка */
+        }
+    </style>
+</head>
+<body>
+
+<div style="text-align: center;">
+    <textarea id="jsonpInput" rows="10" cols="50" placeholder="Paste JSONP text here"></textarea>
+    <br><br>
+    <button onclick="parseJSONP()">Parse and Display</button>
+</div>
+
+<div id="container">
+    <img id="largeImage" src="" alt="Large Image">
+    <img id="smallImage" src="" alt="Small Image">
+</div>
+
+<div style="text-align: center;">
+    <label for="j0">Adjust j0 (Position):</label>
+    <br>
+    <input type="range" id="j0" min="0" max="280" value="0" step="1" oninput="updatePositionAndRotation()">
+    <span id="j0Value">0</span>
+    <br><br>
+    <label for="j1">Enter j1 (Rotation Factor):</label>
+    <input type="number" id="j1" value="1" step="0.01" oninput="updatePositionAndRotation()">
+</div>
+
+<script>
+    let j1 = 1; // Default rotation factor
+
+    document.getElementById('jsonpInput').addEventListener('input', parseJSONP);
+
+    function parseJSONP() {
+        const jsonpText = document.getElementById('jsonpInput').value;
+
+        try {
+            // Преобразуем JSONP в JSON, удалив функцию-обертку
+            const jsonpData = jsonpText.split('__JSONP_nudbdk6_1(')[1].split(')')[0];
+            const jsonData = JSON.parse(jsonpData);
+
+            const largeImageUrl = jsonData.data.bg[0];
+            const smallImageUrl = jsonData.data.front[0];
+            j1 = jsonData.data.attrs[0];
+            document.getElementById('j1').value = j1;
+
+            document.getElementById('largeImage').src = largeImageUrl;
+            document.getElementById('smallImage').src = smallImageUrl;
+
+            updatePositionAndRotation();
+        } catch (e) {
+            alert("Error parsing JSONP: " + e.message);
+        }
+    }
+
+    function updatePositionAndRotation() {
+        var F = 280; // Width of the large image
+        var C = 53; // Width of the small image
+        var ratio = (F / 2 - C) / F; // Calculated ratio
+
+        var j0 = parseFloat(document.getElementById('j0').value);
+        var j1 = parseFloat(document.getElementById('j1').value);
+
+        var j2 = j0 * ratio;
+
+        var smallImage = document.getElementById('smallImage');
+        smallImage.style.left = j2 + 'px';
+        smallImage.style.transform = 'rotate(' + (j1 * j2) + 'deg)';
+        smallImage.style.transformOrigin = j1 > 0 ? 'bottom right' : 'top right';
+
+        document.getElementById('j0Value').innerText = j0;
+    }
+
+    // Initial update to set positions based on default values
+    updatePositionAndRotation();
+</script>
+
+</body>
+</html>
