@@ -32,7 +32,20 @@
 <body>
 
 <div style="text-align: center;">
-    <textarea id="jsonpInput" rows="10" cols="50" placeholder="Paste JSONP text here"></textarea>
+    <span>Paste Response content from request like /api/v4/anti_fraud/captcha/yidun/api/v3/get?referer...</span>
+    <br>
+    <textarea id="jsonpInput" rows="10" cols="50" placeholder="Paste JSONP text here">__JSONP_nudbdk6_1({
+    "data": {
+        "bg": ["https://security-captcha.cache.susercontent.com/api/v4/50017751/clientsecurity/image/ff7ff010b4c042e3b56af8ecf83b1271.jpg", "https://security-captcha.cache.susercontent.com/api/v4/50017751/clientsecurity/image/ff7ff010b4c042e3b56af8ecf83b1271.jpg"],
+        "front": ["https://security-captcha.cache.susercontent.com/api/v4/50017751/clientsecurity/image/e3f5d8c851a146889dcf5f7a76175dbd.png", "https://security-captcha.cache.susercontent.com/api/v4/50017751/clientsecurity/image/e3f5d8c851a146889dcf5f7a76175dbd.png"],
+        "type": 2,
+        "token": "2b9e860bbec44f83b218e9867a22e0c4",
+        "attrs": [1.2217787766187171]
+    },
+    "error": 0,
+    "msg": "ok"
+});
+</textarea>
     <br><br>
     <button onclick="parseJSONP()">Parse and Display</button>
 </div>
@@ -98,6 +111,13 @@
     }
 
     // Initial update to set positions based on default values
+    try {
+        parseJSONP();
+    }
+    catch (e) {
+        console.error(e);
+    }
+
     updatePositionAndRotation();
 </script>
 
