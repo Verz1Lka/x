@@ -75,7 +75,7 @@
 
         try {
             // Преобразуем JSONP в JSON, удалив функцию-обертку
-            const jsonpData = jsonpText.split('__JSONP_nudbdk6_1(')[1].split(')')[0];
+            const jsonpData = jsonpText.split('(')[1].split(')')[0];
             const jsonData = JSON.parse(jsonpData);
 
             const largeImageUrl = jsonData.data.bg[0];
