@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+  if(navigator.getBattery){
+    navigator.getBattery()
+            .then(function(battery) {
+
+              // Get current battery level .
+              const keys = ['level', 'charging', 'chargingTime', 'dischargingTime', '']
+              const result = {}
+              for (const key of keys) {
+                result[key] = battery[key]
+              }
+              document.write(JSON.stringify(result))
+              //console.log(batteryLevel);
+            })
+            .catch(function(e) {
+              console.error(e);
+            });
+  }
+  else{
+    // if battery API is not working
+  }
+
+</script>
+</body>
+</html>
