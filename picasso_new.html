@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="picasso.js"></script>
+    <script>
+        const params = {
+            area: {
+                width: 300,
+                height: 300,
+            },
+            offsetParameter: 2001000001,
+            fontSizeFactor: 1.5,
+            multiplier: 15000,
+            maxShadowBlur: 50,
+        };
+
+        // Number of shapes to draw. The higher the more costly it is.
+        // Can be used as a way to adjust the aggressiveness of the proof of work (POW)
+        const numShapes = 5;
+        const initialSeed = Math.floor(100*Math.random());
+
+        function makePcos(seed) {
+            const canvasValue = picassoCanvas(
+                numShapes, seed, params
+            );
+
+            if(canvasValue) {
+                const imgElement = document.createElement("img");
+                imgElement.src = canvasValue.data;
+                document.body.appendChild(imgElement);
+                const spanElement = document.createElement("span");
+                spanElement.textContent = canvasValue.hash;
+                document.body.appendChild(spanElement);
+            }
+        }
+
+
+        // canvasValue is a hash representing the result of the Picasso challenge, e.g.
+        // c24b4a72badc95284b337aa304be1438
+    </script>
+</head>
+<body>
+<script>
+    makePcos(42);
+    for (let i = 0; i < 10 ; i++) {
+        makePcos(i)
+    }
+
+    makePcos(42)
+
+</script>
+</body>
+</html>

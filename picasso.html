@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+</body>
+<script>
+
+async function gatherData0() {
+    let data0 = {
+        cat: 0,
+        c: {}
+    };
+    try {
+        data0.c.ua = navigator.userAgent;
+        data0.c.hc = navigator.hardwareConcurrency;
+        data0.c.pf = navigator.platform;
+        data0.c.mob = navigator.userAgentData ? navigator.userAgentData.mobile : "NA";
+        data0.c.lngs = JSON.stringify(navigator.languages);
+        data0.c.onL = navigator.onLine;
+
+        let debugInfo;
+        let vendorEnum;
+        let rendererEnum;
+        let canvas = new OffscreenCanvas(1, 1);
+        let gl = canvas.getContext("webgl");
+        let ffRegex = /Firefox\/(\d+)/.exec(navigator.userAgent);
+
+        if (ffRegex && 91 < ffRegex[1]) {
+            vendorEnum = gl.VENDOR;
+            rendererEnum = gl.RENDERER;
+        } else {
+            debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+            vendorEnum = debugInfo.UNMASKED_VENDOR_WEBGL;
+            rendererEnum = debugInfo.UNMASKED_RENDERER_WEBGL;
+        }
+
+        data0.c.glvd = gl.getParameter(vendorEnum);
+        data0.c.glrd = gl.getParameter(rendererEnum);
+    } catch (t) {
+        data0.e = t.message;
+    }
+
+    return data0;
+}
+
+async function hashArrayBufferAsync(t) {
+    const hash = await crypto.subtle.digest("SHA-256", t);
+    return Array.from(new Uint8Array(hash));
+}
+
+function stringifyHash(t) {
+    return t.map(function (t) {
+        return t.toString(16).padStart(2, "0");
+    }).join("");
+}
+
+function safeBtoa(t) {
+    if (btoa) {
+        try {
+            return btoa(t);
+        } catch (t) {
+            return "b_e";
+        }
+    }
+    return "b_u";
+}
+
+async function generateHash() {
+    let e = [];
+    let canvas = new OffscreenCanvas(380, 55);
+    let ctx = canvas.getContext("2d");
+
+    ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#F0A";
+    ctx.fillRect(49, 1, 73, 25);
+
+    let text = "Quartz glyph job vexd cwm finks" + String.fromCharCode(55357, 56898);
+    ctx.fillStyle = "#3A1";
+    ctx.font = '13pt "Times New Roman"';
+    ctx.fillText(text, 5, 17);
+    ctx.fillStyle = "rgba(49, 40, 223, 0.33)";
+    ctx.font = '17pt Arial';
+    ctx.fillText(text, 7, 25);
+
+    let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    e.push(hashArrayBufferAsync(imgData.data));
+    imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    e.push(hashArrayBufferAsync(imgData.data));
+
+    canvas.width = 131;
+    canvas.height = 115;
+    ctx.globalCompositeOperation = "multiply";
+    let colors = [["#E3E", 55, 55], ["#3EE", 95, 55], ["#EE3", 70, 90]];
+
+    for (let f = 0; f < colors.length; f++) {
+        ctx.fillStyle = colors[f][0];
+        ctx.beginPath();
+        ctx.arc(colors[f][1], colors[f][2], 45, 0, 2 * Math.PI, true);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    ctx.fillStyle = "#EA3";
+    ctx.arc(65, 65, 65, 0, 2 * Math.PI, true);
+    ctx.arc(65, 65, 30, 0, 2 * Math.PI, true);
+    ctx.fill("evenodd");
+
+    imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    e.push(hashArrayBufferAsync(imgData.data));
+
+    const hashes = await Promise.all(e);
+    const t = stringifyHash(hashes[0]) != stringifyHash(hashes[1]);
+    const combinedHash = hashes[0].map((t, e) => t ^ hashes[2][e]);
+
+    return t ? "UNST" : stringifyHash(combinedHash);
+}
+
+async function collectPicasso(inputString) {
+    let data2 = { cat: 2 };
+    let startTime = performance.now();
+
+    try {
+        let hash = await new Promise(async (resolve) => {
+            let sum = 0;
+            for (let i = 0; i < inputString.length; i++) {
+                sum += inputString.charCodeAt(i);
+            }
+            sum %= 10;
+            if (sum === 0) sum++;
+
+            resolve(await picassoCanvas(7, sum, {
+                area: { width: 300, height: 300 },
+                offsetParameter: 2001000001,
+                fontSizeFactor: 1.5,
+                multiplier: 15000,
+                maxShadowBlur: 50
+            }));
+        });
+
+        data2.ph = stringifyHash(hash);
+    } catch (t) {
+        data2.e = "Err:" + safeBtoa(t.message.slice(0, 150));
+    }
+
+    data2.pt = performance.now() - startTime;
+    return data2;
+}
+
+async function picassoCanvas(v, w, E) {
+    let i = E.area;
+    let r = E.offsetParameter;
+    let e = E.multiplier;
+    let h = E.fontSizeFactor;
+    let g = E.maxShadowBlur;
+
+    function RandomNumber(t) {
+        this.currentNumber = t % r;
+        if (this.currentNumber <= 0) {
+            this.currentNumber += r;
+        }
+    }
+
+    RandomNumber.prototype.getNext = function () {
+        this.currentNumber = Math.max(e * this.currentNumber % r, 2);
+        return this.currentNumber;
+    };
+
+    const colors = ["#FF6633", "#FFB399", "#FF33FF", "#FFFF99", "#00B3E6", "#E6B333", "#3366E6", "#999966", "#99FF99", "#B34D4D", "#80B300", "#809900", "#E6B3B3", "#6680B3", "#66991A", "#FF99E6", "#CCFF1A", "#FF1A66", "#E6331A", "#33FFCC", "#66994D", "#B366CC", "#4D8000", "#B33300", "#CC80CC", "#66664D", "#991AFF", "#E666FF", "#4DB3FF", "#1AB399", "#E666B3", "#33991A", "#CC9999", "#B3B31A", "#00E680", "#4D8066", "#809980", "#E6FF80", "#1AFF33", "#999933", "#FF3380", "#CCCC00", "#66E64D", "#4D80CC", "#9900B3", "#E64D66", "#4DB380", "#FF4D4D", "#99E6E6", "#6666FF"];
+
+    const drawFunctions = [
+        function (t, ctx, area) {
+            ctx.beginPath();
+            ctx.arc(getNext(t, area.width / 2), getNext(t, area.height / 2), getNext(t, Math.min(area.width / 4, area.height / 4)), 0, 2 * Math.PI, true);
+            ctx.stroke();
+        },
+        function (t, ctx, area) {
+            let chars = Math.max(1, getNext(t, 5));
+            let text = Array.from({ length: chars }, () => String.fromCharCode(65 + getNext(t, 26))).join("");
+            ctx.font = area.height / h + "px aafakefontaa";
+            ctx.fillText(text, getNext(t, area.width), getNext(t, area.height), area.width);
+        },
+        function (t, ctx, area) {
+            ctx.beginPath();
+            ctx.moveTo(getNext(t, area.width), getNext(t, area.height));
+            ctx.bezierCurveTo(getNext(t, area.width), getNext(t, area.height), getNext(t, area.width), getNext(t, area.height), getNext(t, area.width), getNext(t, area.height));
+            ctx.stroke();
+        },
+        function (t, ctx, area) {
+            ctx.beginPath();
+            ctx.moveTo(getNext(t, area.width), getNext(t, area.height));
+            ctx.quadraticCurveTo(getNext(t, area.width), getNext(t, area.height), getNext(t, area.width), getNext(t, area.height));
+            ctx.stroke();
+        }
+    ];
+
+    function getNext(t, max) {
+        return Math.floor((t.getNext() - 1) / r * max);
+    }
+
+    const randomNum = new RandomNumber(w);
+    const canvas = new OffscreenCanvas(i.width, i.height);
+    const ctx = canvas.getContext("2d");
+    const hashes = [];
+
+    function draw(v) {
+        let grad = ctx.createRadialGradient(getNext(randomNum, i.width), getNext(randomNum, i.height), getNext(randomNum, i.width), getNext(randomNum, i.width), getNext(randomNum, i.height), getNext(randomNum, i.width));
+        grad.addColorStop(0, colors[getNext(randomNum, colors.length)]);
+        grad.addColorStop(1, colors[getNext(randomNum, colors.length)]);
+        ctx.fillStyle = grad;
+        ctx.shadowBlur = getNext(randomNum, g);
+        ctx.shadowColor = colors[getNext(randomNum, colors.length)];
+        drawFunctions[getNext(randomNum, drawFunctions.length)](randomNum, ctx, i);
+        ctx.fill();
+    }
+
+    for (let m = 0; m <= v; m++) {
+        draw(v - m);
+        let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        hashes.push(hashArrayBufferAsync(imgData.data));
+    }
+
+    const allHashes = await Promise.all(hashes);
+    const len = allHashes[0].length;
+    const combinedHash = new Uint8Array(len * allHashes.length);
+
+    for (let n = 0; n < allHashes.length; n++) {
+        combinedHash.set(allHashes[n], n * len);
+    }
+
+    return hashArrayBufferAsync(combinedHash);
+}
+
+async function getData() {
+    const data0 = await gatherData0();
+    const hash = await generateHash();
+    const data2 = await collectPicasso(hash);
+
+    return { data0, data2 };
+}
+
+// Пример вызова с использованием await:
+async function main() {
+    const myData = await getData();
+    console.log(myData);
+    var pre = document.createElement('pre');
+    pre.textContent = JSON.stringify(myData, null, 2);
+    document.body.appendChild(pre);
+}
+
+main();
+
+
+
+</script>
+</html>
+
