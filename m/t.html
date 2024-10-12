@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <title>Отслеживание Tap и Click Событий</title>
     <style>
-        body {
+        body, html {
+            height: 100%;
+            margin: 0;
             font-family: Arial, sans-serif;
-            margin: 20px;
+            display: flex;
+            flex-direction: column;
         }
         #touchArea {
-            width: 100%;
-            height: 300px;
+            flex: 1; /* Занимает оставшееся пространство */
             background-color: #f0f0f0;
             border: 2px dashed #ccc;
             display: flex;
@@ -21,10 +23,9 @@
             user-select: none; /* Предотвращает выделение текста при клике */
         }
         #log {
-            margin-top: 20px;
-            max-height: 300px;
+            height: 40%;
             overflow-y: auto;
-            border: 1px solid #ccc;
+            border-top: 1px solid #ccc;
             padding: 10px;
             background-color: #fafafa;
         }
@@ -38,7 +39,7 @@
 </head>
 <body>
 
-<h1>Отслеживание Tap и Click Событий</h1>
+<h1 style="text-align:center; margin:10px 0;">Отслеживание Tap и Click Событий</h1>
 
 <div id="touchArea">
     <p>Коснитесь или кликните здесь</p>
@@ -53,16 +54,6 @@
     const touchArea = document.getElementById('touchArea');
     const logArea = document.getElementById('log');
 
-    // Переменные для отслеживания Touch событий
-    let touchStartTime = 0;
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    // Переменные для отслеживания Mouse событий
-    let mouseStartTime = 0;
-    let mouseStartX = 0;
-    let mouseStartY = 0;
-
     // Функция для добавления записи в лог
     function addLogEntry(entry) {
         const entryDiv = document.createElement('div');
@@ -73,130 +64,167 @@
         logArea.scrollTop = logArea.scrollHeight;
     }
 
-    // --- Обработка Touch Событий ---
+    // Функция для форматирования координат
+    function formatCoords(x, y) {
+        return `(${x.toFixed(2)}, ${y.toFixed(2)})`;
+    }
 
-    // Обработчик события touchstart
-    touchArea.addEventListener('touchstart', function(event) {
-        if (event.touches.length > 1) return; // Игнорировать множественные касания
+    // Используем Pointer Events для универсальной обработки
+    if (window.PointerEvent) {
+        let pointerData = {};
 
-        const touch = event.touches[0];
-        touchStartTime = Date.now();
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-    }, false);
+        touchArea.addEventListener('pointerdown', function(event) {
+            // Записываем начальные данные
+            pointerData[event.pointerId] = {
+                type: event.pointerType,
+                startTime: Date.now(),
+                startX: event.clientX,
+                startY: event.clientY,
+                path: [{x: event.clientX, y: event.clientY}],
+                pressure: event.pressure,
+                radiusX: event.radiusX,
+                radiusY: event.radiusY
+            };
+        }, false);
 
-    // Обработчик события touchend
-    touchArea.addEventListener('touchend', function(event) {
-        if (event.changedTouches.length > 1) return; // Игнорировать множественные касания
+        touchArea.addEventListener('pointermove', function(event) {
+            if (pointerData[event.pointerId]) {
+                pointerData[event.pointerId].path.push({x: event.clientX, y: event.clientY});
+            }
+        }, false);
 
-        const touch = event.changedTouches[0];
-        const touchEndTime = Date.now();
-        const duration = touchEndTime - touchStartTime; // в миллисекундах
-        const touchEndX = touch.clientX;
-        const touchEndY = touch.clientY;
+        touchArea.addEventListener('pointerup', function(event) {
+            if (pointerData[event.pointerId]) {
+                const data = pointerData[event.pointerId];
+                const endTime = Date.now();
+                const duration = endTime - data.startTime;
+                const endX = event.clientX;
+                const endY = event.clientY;
+                const trajectory = data.path.map(point => formatCoords(point.x, point.y)).join(' → ');
+                const size = `(${data.radiusX.toFixed(2)}, ${data.radiusY.toFixed(2)})`;
 
-        // Координаты касания (можно использовать touchStartX/Y или touchEndX/Y)
-        const x = touchEndX;
-        const y = touchEndY;
+                const logEntry = `
+                        <strong>Pointer ${data.type} событие:</strong><br>
+                        Тип: ${data.type}<br>
+                        Длительность: ${duration} мс<br>
+                        Начало: ${formatCoords(data.startX, data.startY)}<br>
+                        Конец: ${formatCoords(endX, endY)}<br>
+                        Траектория: ${trajectory}<br>
+                        Размер касания: ${size}<br>
+                        Давление: ${data.pressure.toFixed(2)}
+                    `;
+                addLogEntry(logEntry);
+                // Удаляем данные о указателе
+                delete pointerData[event.pointerId];
+            }
+        }, false);
 
-        // Формируем запись для лога
-        const logEntry = `
-                <strong>Touch событие:</strong><br>
-                Длительность: ${duration} мс<br>
-                Координаты: (${x}, ${y})
-            `;
+        // Предотвращаем стандартные действия браузера
+        touchArea.addEventListener('pointercancel', function(event) {
+            if (pointerData[event.pointerId]) {
+                delete pointerData[event.pointerId];
+            }
+        }, false);
+    } else {
+        // Fallback для браузеров без поддержки Pointer Events
 
-        addLogEntry(logEntry);
-    }, false);
+        let touchInProgress = false;
+        let mouseInProgress = false;
+        let touchStartTime = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchPath = [];
 
-    // Предотвращение стандартных действий при касании
-    touchArea.addEventListener('touchmove', function(event) {
-        event.preventDefault();
-    }, false);
-
-    // --- Обработка Mouse Событий ---
-
-    // Обработчик события mousedown
-    touchArea.addEventListener('mousedown', function(event) {
-        // Только левая кнопка мыши
-        if (event.button !== 0) return;
-
-        mouseStartTime = Date.now();
-        mouseStartX = event.clientX;
-        mouseStartY = event.clientY;
-    }, false);
-
-    // Обработчик события mouseup
-    touchArea.addEventListener('mouseup', function(event) {
-        // Только левая кнопка мыши
-        if (event.button !== 0) return;
-
-        const mouseEndTime = Date.now();
-        const duration = mouseEndTime - mouseStartTime; // в миллисекундах
-        const mouseEndX = event.clientX;
-        const mouseEndY = event.clientY;
-
-        // Координаты клика (можно использовать mouseStartX/Y или mouseEndX/Y)
-        const x = mouseEndX;
-        const y = mouseEndY;
-
-        // Формируем запись для лога
-        const logEntry = `
-                <strong>Mouse событие:</strong><br>
-                Длительность: ${duration} мс<br>
-                Координаты: (${x}, ${y})
-            `;
-
-        addLogEntry(logEntry);
-    }, false);
-
-    // Дополнительно: обработка события click для отладки
-    /*
-    touchArea.addEventListener('click', function(event) {
-        addLogEntry(`<strong>Click событие:</strong> (${event.clientX}, ${event.clientY})`);
-    }, false);
-    */
-
-    // Дополнительно: обработка событий pointer (универсальный подход)
-    /*
-    touchArea.addEventListener('pointerdown', function(event) {
-        if (event.pointerType === 'touch') {
+        // Обработчики Touch событий
+        touchArea.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) return; // Игнорировать множественные касания
+            touchInProgress = true;
+            const touch = event.touches[0];
             touchStartTime = Date.now();
-            touchStartX = event.clientX;
-            touchStartY = event.clientY;
-        } else if (event.pointerType === 'mouse' && event.button === 0) {
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchPath = [{x: touch.clientX, y: touch.clientY}];
+        }, false);
+
+        touchArea.addEventListener('touchmove', function(event) {
+            if (!touchInProgress) return;
+            const touch = event.touches[0];
+            touchPath.push({x: touch.clientX, y: touch.clientY});
+        }, false);
+
+        touchArea.addEventListener('touchend', function(event) {
+            if (!touchInProgress) return;
+            const touch = event.changedTouches[0];
+            const touchEndTime = Date.now();
+            const duration = touchEndTime - touchStartTime;
+            const touchEndX = touch.clientX;
+            const touchEndY = touch.clientY;
+            const trajectory = touchPath.map(point => formatCoords(point.x, point.y)).join(' → ');
+            // Размер касания не всегда доступен, но можно использовать touch.radiusX/Y
+            const size = `(${touch.radiusX.toFixed(2)}, ${touch.radiusY.toFixed(2)})`;
+            const logEntry = `
+                    <strong>Touch событие:</strong><br>
+                    Длительность: ${duration} мс<br>
+                    Начало: ${formatCoords(touchStartX, touchStartY)}<br>
+                    Конец: ${formatCoords(touchEndX, touchEndY)}<br>
+                    Траектория: ${trajectory}<br>
+                    Размер касания: ${size}<br>
+                    Давление: ${touch.force.toFixed(2)}
+                `;
+            addLogEntry(logEntry);
+            touchInProgress = false;
+        }, false);
+
+        // Обработчики Mouse событий
+        touchArea.addEventListener('mousedown', function(event) {
+            if (touchInProgress) return; // Игнорировать мышь, если идет touch
+            if (event.button !== 0) return; // Только левая кнопка
+            mouseInProgress = true;
             mouseStartTime = Date.now();
             mouseStartX = event.clientX;
             mouseStartY = event.clientY;
-        }
-    }, false);
+            touchPath = [{x: event.clientX, y: event.clientY}];
+        }, false);
 
-    touchArea.addEventListener('pointerup', function(event) {
-        if (event.pointerType === 'touch') {
-            const touchEndTime = Date.now();
-            const duration = touchEndTime - touchStartTime;
-            const x = event.clientX;
-            const y = event.clientY;
-            const logEntry = `
-                <strong>Pointer Touch событие:</strong><br>
-                Длительность: ${duration} мс<br>
-                Координаты: (${x}, ${y})
-            `;
-            addLogEntry(logEntry);
-        } else if (event.pointerType === 'mouse' && event.button === 0) {
+        touchArea.addEventListener('mousemove', function(event) {
+            if (!mouseInProgress) return;
+            touchPath.push({x: event.clientX, y: event.clientY});
+        }, false);
+
+        touchArea.addEventListener('mouseup', function(event) {
+            if (!mouseInProgress) return;
+            if (event.button !== 0) return; // Только левая кнопка
             const mouseEndTime = Date.now();
             const duration = mouseEndTime - mouseStartTime;
-            const x = event.clientX;
-            const y = event.clientY;
+            const mouseEndX = event.clientX;
+            const mouseEndY = event.clientY;
+            const trajectory = touchPath.map(point => formatCoords(point.x, point.y)).join(' → ');
+            // Размер касания для мыши недоступен
+            const size = `N/A`;
             const logEntry = `
-                <strong>Pointer Mouse событие:</strong><br>
-                Длительность: ${duration} мс<br>
-                Координаты: (${x}, ${y})
-            `;
+                    <strong>Mouse событие:</strong><br>
+                    Длительность: ${duration} мс<br>
+                    Начало: ${formatCoords(mouseStartX, mouseStartY)}<br>
+                    Конец: ${formatCoords(mouseEndX, mouseEndY)}<br>
+                    Траектория: ${trajectory}<br>
+                    Размер касания: ${size}<br>
+                    Давление: N/A
+                `;
             addLogEntry(logEntry);
-        }
-    }, false);
-    */
+            mouseInProgress = false;
+        }, false);
+
+        // Предотвращение обработки Mouse событий после Touch событий
+        touchArea.addEventListener('touchstart', function(event) {
+            touchInProgress = true;
+        }, false);
+
+        touchArea.addEventListener('touchend', function(event) {
+            setTimeout(() => {
+                touchInProgress = false;
+            }, 1000); // Задержка, чтобы игнорировать последующие mouse события
+        }, false);
+    }
 </script>
 </body>
 </html>
