@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Отслеживание Tap Событий</title>
+    <title>Отслеживание Tap и Click Событий</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,6 +17,8 @@
             align-items: center;
             justify-content: center;
             touch-action: none; /* Отключает стандартные действия браузера */
+            position: relative;
+            user-select: none; /* Предотвращает выделение текста при клике */
         }
         #log {
             margin-top: 20px;
@@ -30,21 +32,171 @@
             margin-bottom: 10px;
             padding-bottom: 5px;
             border-bottom: 1px solid #e0e0e0;
+            word-wrap: break-word;
         }
     </style>
 </head>
 <body>
 
-<h1>Отслеживание Tap Событий</h1>
+<h1>Отслеживание Tap и Click Событий</h1>
 
 <div id="touchArea">
-    <p>Коснитесь здесь</p>
+    <p>Коснитесь или кликните здесь</p>
 </div>
 
 <div id="log">
     <h2>Лог Событий</h2>
 </div>
 
-<script src="script.js"></script>
+<script>
+    // Получаем элементы
+    const touchArea = document.getElementById('touchArea');
+    const logArea = document.getElementById('log');
+
+    // Переменные для отслеживания Touch событий
+    let touchStartTime = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    // Переменные для отслеживания Mouse событий
+    let mouseStartTime = 0;
+    let mouseStartX = 0;
+    let mouseStartY = 0;
+
+    // Функция для добавления записи в лог
+    function addLogEntry(entry) {
+        const entryDiv = document.createElement('div');
+        entryDiv.className = 'log-entry';
+        entryDiv.innerHTML = entry;
+        logArea.appendChild(entryDiv);
+        // Прокрутка к последней записи
+        logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    // --- Обработка Touch Событий ---
+
+    // Обработчик события touchstart
+    touchArea.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) return; // Игнорировать множественные касания
+
+        const touch = event.touches[0];
+        touchStartTime = Date.now();
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+    }, false);
+
+    // Обработчик события touchend
+    touchArea.addEventListener('touchend', function(event) {
+        if (event.changedTouches.length > 1) return; // Игнорировать множественные касания
+
+        const touch = event.changedTouches[0];
+        const touchEndTime = Date.now();
+        const duration = touchEndTime - touchStartTime; // в миллисекундах
+        const touchEndX = touch.clientX;
+        const touchEndY = touch.clientY;
+
+        // Координаты касания (можно использовать touchStartX/Y или touchEndX/Y)
+        const x = touchEndX;
+        const y = touchEndY;
+
+        // Формируем запись для лога
+        const logEntry = `
+                <strong>Touch событие:</strong><br>
+                Длительность: ${duration} мс<br>
+                Координаты: (${x}, ${y})
+            `;
+
+        addLogEntry(logEntry);
+    }, false);
+
+    // Предотвращение стандартных действий при касании
+    touchArea.addEventListener('touchmove', function(event) {
+        event.preventDefault();
+    }, false);
+
+    // --- Обработка Mouse Событий ---
+
+    // Обработчик события mousedown
+    touchArea.addEventListener('mousedown', function(event) {
+        // Только левая кнопка мыши
+        if (event.button !== 0) return;
+
+        mouseStartTime = Date.now();
+        mouseStartX = event.clientX;
+        mouseStartY = event.clientY;
+    }, false);
+
+    // Обработчик события mouseup
+    touchArea.addEventListener('mouseup', function(event) {
+        // Только левая кнопка мыши
+        if (event.button !== 0) return;
+
+        const mouseEndTime = Date.now();
+        const duration = mouseEndTime - mouseStartTime; // в миллисекундах
+        const mouseEndX = event.clientX;
+        const mouseEndY = event.clientY;
+
+        // Координаты клика (можно использовать mouseStartX/Y или mouseEndX/Y)
+        const x = mouseEndX;
+        const y = mouseEndY;
+
+        // Формируем запись для лога
+        const logEntry = `
+                <strong>Mouse событие:</strong><br>
+                Длительность: ${duration} мс<br>
+                Координаты: (${x}, ${y})
+            `;
+
+        addLogEntry(logEntry);
+    }, false);
+
+    // Дополнительно: обработка события click для отладки
+    /*
+    touchArea.addEventListener('click', function(event) {
+        addLogEntry(`<strong>Click событие:</strong> (${event.clientX}, ${event.clientY})`);
+    }, false);
+    */
+
+    // Дополнительно: обработка событий pointer (универсальный подход)
+    /*
+    touchArea.addEventListener('pointerdown', function(event) {
+        if (event.pointerType === 'touch') {
+            touchStartTime = Date.now();
+            touchStartX = event.clientX;
+            touchStartY = event.clientY;
+        } else if (event.pointerType === 'mouse' && event.button === 0) {
+            mouseStartTime = Date.now();
+            mouseStartX = event.clientX;
+            mouseStartY = event.clientY;
+        }
+    }, false);
+
+    touchArea.addEventListener('pointerup', function(event) {
+        if (event.pointerType === 'touch') {
+            const touchEndTime = Date.now();
+            const duration = touchEndTime - touchStartTime;
+            const x = event.clientX;
+            const y = event.clientY;
+            const logEntry = `
+                <strong>Pointer Touch событие:</strong><br>
+                Длительность: ${duration} мс<br>
+                Координаты: (${x}, ${y})
+            `;
+            addLogEntry(logEntry);
+        } else if (event.pointerType === 'mouse' && event.button === 0) {
+            const mouseEndTime = Date.now();
+            const duration = mouseEndTime - mouseStartTime;
+            const x = event.clientX;
+            const y = event.clientY;
+            const logEntry = `
+                <strong>Pointer Mouse событие:</strong><br>
+                Длительность: ${duration} мс<br>
+                Координаты: (${x}, ${y})
+            `;
+            addLogEntry(logEntry);
+        }
+    }, false);
+    */
+</script>
 </body>
 </html>
