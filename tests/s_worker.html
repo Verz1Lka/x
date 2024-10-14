@@ -51,103 +51,120 @@
 <script>
   // Весь код воркера как часть основного кода
   const workerCode = `
-        function getWebGLContext(c) {
-            try {
-                return c.getContext('webgl') || c.getContext('experimental-webgl');
-            } catch (ignored) {
-                return null;
+        if (typeof OffscreenCanvas !== 'function') {
+    postMessage(false);
+}
+var canvas = new OffscreenCanvas(0, 0);
+var gl = getWebGL(canvas);
+if (!gl) {
+    postMessage(false);
+}
+onmessage = function(e) {
+    var segment = e.data.segment;
+    try {
+        if (segment === 'a' || segment === 'b') {
+            var _e$data = e.data,
+                parameters = _e$data.parameters,
+                methods = _e$data.methods;
+            var result = [];
+            for (var i = 0; i < parameters.length; i++) {
+                result.push(gl[methods[0]](parameters[i]));
             }
-        }
-
-        function handleSegmentAorB(gl, data) {
-            const { parameters, methods } = data;
-            const result = parameters.map(param => gl[methods[0]](param));
-            return result;
-        }
-
-        function handleSegmentCorD(gl, data) {
-            const { parameters, extensions, methods } = data;
-            let ext = extensions.some(extension => gl[methods[0]](extension));
+            postMessage({
+                segment: segment,
+                result: result
+            });
+        } else if (segment === 'c' || segment === 'd') {
+            var _e$data2 = e.data,
+                _parameters = _e$data2.parameters,
+                extensions = _e$data2.extensions,
+                _methods = _e$data2.methods;
+            var _result = [];
+            var ext = false;
+            for (var _i = 0; _i < extensions.length; _i++) {
+                ext = ext || gl[_methods[0]](extensions[_i]);
+            }
             if (ext) {
-                return parameters.map(param => gl[methods[1]](ext[param]));
-            }
-            return -1;
-        }
-
-        function handleSegmentE(gl, data) {
-            const { methods, properties } = data;
-            const context = gl[methods[0]]();
-            return context ? context[properties[0]] : false;
-        }
-
-        function handleSegmentF(gl, data) {
-            const { methods, shaderParams, shaderFloatPrecision, shaderIntPrecision, shaderProperties } = data;
-            const result = [];
-            if (typeof gl[methods[0]] === 'function') {
-                shaderParams.forEach(param => {
-                    shaderFloatPrecision.forEach(precision => {
-                        let shader = gl[methods[0]](param, precision);
-                        shader = shader == null ? '' : [shader[shaderProperties[0]], shader[shaderProperties[1]], shader[shaderProperties[2]]].join('');
-                        result.push(shader);
-                    });
-                    shaderIntPrecision.forEach(precision => {
-                        let shader = gl[methods[0]](param, precision);
-                        shader = shader == null ? '' : [shader[shaderProperties[0]], shader[shaderProperties[1]], shader[shaderProperties[2]]].join('');
-                        result.push(shader);
-                    });
-                });
-            }
-            return result;
-        }
-
-        function handleSegmentG(gl, data) {
-            const { methods } = data;
-            return gl[methods[0]]() || [];
-        }
-
-        function handleSegmentH(gl) {
-            return Object.keys(gl);
-        }
-
-        onmessage = function(e) {
-            const { segment } = e.data;
-            try {
-                const gl = getWebGLContext(new OffscreenCanvas(0, 0));
-                if (!gl) {
-                    postMessage(false);
-                    return;
+                for (var _i2 = 0; _i2 < _parameters.length; _i2++) {
+                    _result.push(gl[_methods[1]](ext[_parameters[_i2]]));
                 }
-
-                let result;
-                switch (segment) {
-                    case 'a':
-                    case 'b':
-                        result = handleSegmentAorB(gl, e.data);
-                        break;
-                    case 'c':
-                    case 'd':
-                        result = handleSegmentCorD(gl, e.data);
-                        break;
-                    case 'e':
-                        result = handleSegmentE(gl, e.data);
-                        break;
-                    case 'f':
-                        result = handleSegmentF(gl, e.data);
-                        break;
-                    case 'g':
-                        result = handleSegmentG(gl, e.data);
-                        break;
-                    case 'h':
-                        result = handleSegmentH(gl);
-                        break;
-                    default:
-                        result = false;
-                }
-                postMessage({ segment, result });
-            } catch (error) {
-                postMessage(false);
+            } else {
+                _result = -1;
             }
-        };
+            postMessage({
+                segment: segment,
+                result: _result
+            });
+        } else if (segment === 'e') {
+            var _e$data3 = e.data,
+                _methods2 = _e$data3.methods,
+                properties = _e$data3.properties;
+            var _result2 = function(x) {
+                return x ? x[properties[0]] : false;
+            }(gl[_methods2[0]]());
+            postMessage({
+                segment: segment,
+                result: _result2
+            });
+        } else if (segment === 'f') {
+            var _e$data4 = e.data,
+                _methods3 = _e$data4.methods,
+                shaderParams = _e$data4.shaderParams,
+                shaderFloatPrecision = _e$data4.shaderFloatPrecision,
+                shaderIntPrecision = _e$data4.shaderIntPrecision,
+                shaderProperties = _e$data4.shaderProperties;
+            var _result3 = [];
+            if (typeof gl[_methods3[0]] === 'function') {
+                for (var _i3 = 0; _i3 < shaderParams.length; _i3++) {
+                    for (var j = 0; j < shaderFloatPrecision.length; j++) {
+                        var x = gl[_methods3[0]](shaderParams[_i3], shaderFloatPrecision[j]);
+                        x = x == null ? '' : [x[shaderProperties[0]], x[shaderProperties[1]], x[shaderProperties[2]]].join('');
+                        _result3.push(x);
+                    }
+                }
+                for (var _i4 = 0; _i4 < shaderParams.length; _i4++) {
+                    for (var _j = 0; _j < shaderIntPrecision.length; _j++) {
+                        var _x = gl[_methods3[0]](shaderParams[_i4], shaderIntPrecision[_j]);
+                        _x = _x == null ? '' : [_x[shaderProperties[0]], _x[shaderProperties[1]], _x[shaderProperties[2]]].join('');
+                        _result3.push(_x);
+                    }
+                }
+            } else {
+                _result3 = void 0;
+            }
+            postMessage({
+                segment: segment,
+                result: _result3
+            });
+        } else if (segment === 'g') {
+            var _methods4 = e.data.methods;
+            var _result4 = gl[_methods4[0]]() || [];
+            postMessage({
+                segment: segment,
+                result: _result4
+            });
+        } else if (segment === 'h') {
+            var _result5 = [];
+            for (var prop in gl) {
+                _result5.push(prop);
+            }
+            postMessage({
+                segment: segment,
+                result: _result5
+            });
+        }
+    } catch (error) {
+        postMessage(false);
+    }
+};
+
+function getWebGL(c) {
+    var graphicsLib = null;
+    try {
+        graphicsLib = c.getContext('webgl') || c.getContext('experimental-webgl');
+    } catch (ignored) {}
+    return graphicsLib;
+}
         `;
 
   // Создание воркера через Blob
@@ -200,7 +217,7 @@
       );
     }
 
-    document.getElementById('top-level-output').textContent += JSON.stringify(results, null, 2) + '\\n';
+    document.getElementById('top-level-output').textContent += JSON.stringify(results, null, 2);
   }
 
   // Функции для top-level контекста
@@ -211,10 +228,20 @@
 
   function handleSegmentCorD(gl, data) {
     const { parameters, extensions, methods } = data;
-    let ext = extensions.some(extension => gl[methods[0]](extension));
+    let ext = null;
+
+    // Пробуем получить первое доступное расширение из списка
+    for (let i = 0; i < extensions.length; i++) {
+      ext = gl[methods[0]](extensions[i]);
+      if (ext) break;  // Если расширение найдено, прекращаем цикл
+    }
+
+    // Если расширение найдено, то возвращаем результаты вызовов метода gl
     if (ext) {
       return parameters.map(param => gl[methods[1]](ext[param]));
     }
+
+    // Если расширение не найдено, возвращаем -1
     return -1;
   }
 
@@ -250,7 +277,11 @@
   }
 
   function handleSegmentH(gl) {
-    return Object.keys(gl);
+    const results = [];
+    for (let prop in gl) {
+      results.push(prop);
+    }
+    return results;
   }
 
   // Выполнение top-level контекста
