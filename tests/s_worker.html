@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGL Worker and Top-Level Context Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+    }
+    .output-box {
+      width: 45%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+      overflow: auto;
+      height: 90%;
+      background-color: #f9f9f9;
+    }
+    .output-box h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Left column: Top-Level Context Output -->
+  <div class="output-box">
+    <h2>Top-Level Output</h2>
+    <pre id="top-level-output"></pre>
+  </div>
+
+  <!-- Right column: Worker Output -->
+  <div class="output-box">
+    <h2>Worker Output</h2>
+    <pre id="worker-output"></pre>
+  </div>
+</div>
+
+<script>
+  // Весь код воркера как часть основного кода
+  const workerCode = `
+        function getWebGLContext(c) {
+            try {
+                return c.getContext('webgl') || c.getContext('experimental-webgl');
+            } catch (ignored) {
+                return null;
+            }
+        }
+
+        function handleSegmentAorB(gl, data) {
+            const { parameters, methods } = data;
+            const result = parameters.map(param => gl[methods[0]](param));
+            return result;
+        }
+
+        function handleSegmentCorD(gl, data) {
+            const { parameters, extensions, methods } = data;
+            let ext = extensions.some(extension => gl[methods[0]](extension));
+            if (ext) {
+                return parameters.map(param => gl[methods[1]](ext[param]));
+            }
+            return -1;
+        }
+
+        function handleSegmentE(gl, data) {
+            const { methods, properties } = data;
+            const context = gl[methods[0]]();
+            return context ? context[properties[0]] : false;
+        }
+
+        function handleSegmentF(gl, data) {
+            const { methods, shaderParams, shaderFloatPrecision, shaderIntPrecision, shaderProperties } = data;
+            const result = [];
+            if (typeof gl[methods[0]] === 'function') {
+                shaderParams.forEach(param => {
+                    shaderFloatPrecision.forEach(precision => {
+                        let shader = gl[methods[0]](param, precision);
+                        shader = shader == null ? '' : [shader[shaderProperties[0]], shader[shaderProperties[1]], shader[shaderProperties[2]]].join('');
+                        result.push(shader);
+                    });
+                    shaderIntPrecision.forEach(precision => {
+                        let shader = gl[methods[0]](param, precision);
+                        shader = shader == null ? '' : [shader[shaderProperties[0]], shader[shaderProperties[1]], shader[shaderProperties[2]]].join('');
+                        result.push(shader);
+                    });
+                });
+            }
+            return result;
+        }
+
+        function handleSegmentG(gl, data) {
+            const { methods } = data;
+            return gl[methods[0]]() || [];
+        }
+
+        function handleSegmentH(gl) {
+            return Object.keys(gl);
+        }
+
+        onmessage = function(e) {
+            const { segment } = e.data;
+            try {
+                const gl = getWebGLContext(new OffscreenCanvas(0, 0));
+                if (!gl) {
+                    postMessage(false);
+                    return;
+                }
+
+                let result;
+                switch (segment) {
+                    case 'a':
+                    case 'b':
+                        result = handleSegmentAorB(gl, e.data);
+                        break;
+                    case 'c':
+                    case 'd':
+                        result = handleSegmentCorD(gl, e.data);
+                        break;
+                    case 'e':
+                        result = handleSegmentE(gl, e.data);
+                        break;
+                    case 'f':
+                        result = handleSegmentF(gl, e.data);
+                        break;
+                    case 'g':
+                        result = handleSegmentG(gl, e.data);
+                        break;
+                    case 'h':
+                        result = handleSegmentH(gl);
+                        break;
+                    default:
+                        result = false;
+                }
+                postMessage({ segment, result });
+            } catch (error) {
+                postMessage(false);
+            }
+        };
+        `;
+
+  // Создание воркера через Blob
+  const blob = new Blob([workerCode], { type: 'application/javascript' });
+  const worker = new Worker(URL.createObjectURL(blob));
+
+  // Функция для отправки сообщений в воркер и вывода результата
+  function sendWorkerMessage(message) {
+    worker.postMessage(message);
+  }
+
+  worker.onmessage = function(event) {
+    const output_text = document.getElementById('worker-output').textContent;
+    const output_data = output_text ? JSON.parse(output_text) : [];
+    output_data.push(event.data);
+    document.getElementById('worker-output').textContent = JSON.stringify(output_data, null, 2);
+  };
+
+  // Сообщения для отправки в воркер
+  const messages = [
+    {"segment": "a", "parameters": [33902, 33901, 3386], "methods": ["getParameter"]},
+    {"segment": "b", "parameters": [3413, 3412, 3411, 3410, 3414, 35661, 34076, 36349, 34024, 34930, 3379, 36348, 34921, 35660, 36347, 7937, 35724, 3415, 7936, 7938], "methods": ["getParameter"]},
+    {"segment": "c", "parameters": ["UNMASKED_VENDOR_WEBGL", "UNMASKED_RENDERER_WEBGL"], "extensions": ["WEBGL_debug_renderer_info"], "methods": ["getExtension", "getParameter"]},
+    {"segment": "d", "parameters": ["MAX_TEXTURE_MAX_ANISOTROPY_EXT"], "extensions": ["EXT_texture_filter_anisotropic", "WEBKIT_EXT_texture_filter_anisotropic", "MOZ_EXT_texture_filter_anisotropic"], "methods": ["getExtension", "getParameter"]},
+    {"segment": "e", "methods": ["getContextAttributes"], "properties": ["antialias"]},
+    {"segment": "f", "methods": ["getShaderPrecisionFormat"], "shaderParams": [35633, 35632], "shaderFloatPrecision": [36338, 36337, 36336], "shaderIntPrecision": [36341, 36340, 36339], "shaderProperties": ["precision", "rangeMin", "rangeMax"]},
+    {"segment": "g", "methods": ["getSupportedExtensions"]},
+    {"segment": "h"}
+  ];
+
+  // Отправка сообщений в воркер
+  messages.forEach(message => sendWorkerMessage(message));
+
+  // Возможность выполнить те же действия на top-level контексте
+  async function executeTopLevel() {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const results = [];
+
+    if (gl) {
+      results.push(
+              {"segment": "a", "result": handleSegmentAorB(gl, messages[0])},
+              {"segment": "b", "result": handleSegmentAorB(gl, messages[1])},
+              {"segment": "c", "result": handleSegmentCorD(gl, messages[2])},
+              {"segment": "d", "result": handleSegmentCorD(gl, messages[3])},
+              {"segment": "e", "result": handleSegmentE(gl, messages[4])},
+              {"segment": "f", "result": handleSegmentF(gl, messages[5])},
+              {"segment": "g", "result": handleSegmentG(gl, messages[6])},
+              {"segment": "h", "result": handleSegmentH(gl)}
+      );
+    }
+
+    document.getElementById('top-level-output').textContent += JSON.stringify(results, null, 2) + '\\n';
+  }
+
+  // Функции для top-level контекста
+  function handleSegmentAorB(gl, data) {
+    const { parameters, methods } = data;
+    return parameters.map(param => gl[methods[0]](param));
+  }
+
+  function handleSegmentCorD(gl, data) {
+    const { parameters, extensions, methods } = data;
+    let ext = extensions.some(extension => gl[methods[0]](extension));
+    if (ext) {
+      return parameters.map(param => gl[methods[1]](ext[param]));
+    }
+    return -1;
+  }
+
+  function handleSegmentE(gl, data) {
+    const { methods, properties } = data;
+    const context = gl[methods[0]]();
+    return context ? context[properties[0]] : false;
+  }
+
+  function handleSegmentF(gl, data) {
+    const { methods, shaderParams, shaderFloatPrecision, shaderIntPrecision, shaderProperties } = data;
+    const result = [];
+    if (typeof gl[methods[0]] === 'function') {
+      shaderParams.forEach(param => {
+        shaderFloatPrecision.forEach(precision => {
+          let shader = gl[methods[0]](param, precision);
+          shader = shader == null ? '' : [shader[shaderProperties[0]], shader[shaderProperties[1]], shader[shaderProperties[2]]].join('');
+          result.push(shader);
+        });
+        shaderIntPrecision.forEach(precision => {
+          let shader = gl[methods[0]](param, precision);
+          shader = shader == null ? '' : [shader[shaderProperties[0]], shader[shaderProperties[1]], shader[shaderProperties[2]]].join('');
+          result.push(shader);
+        });
+      });
+    }
+    return result;
+  }
+
+  function handleSegmentG(gl, data) {
+    const { methods } = data;
+    return gl[methods[0]]() || [];
+  }
+
+  function handleSegmentH(gl) {
+    return Object.keys(gl);
+  }
+
+  // Выполнение top-level контекста
+  executeTopLevel();
+</script>
+</body>
+</html>
