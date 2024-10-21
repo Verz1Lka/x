@@ -1,0 +1,11 @@
+<html></html>
+<script>
+    let iframe = document.createElement('iframe');
+    // Set its "srcdoc" property to any value
+    iframe.srcdoc = 'datadome';
+    // Insert the iframe into the DOM
+    document.body.appendChild(iframe);
+    // Detect the evasion
+    let detected = iframe.contentWindow.self.get?.toString();
+    document.write(detected);
+</script>
