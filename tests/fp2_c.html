@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<pre id="result"></pre>
+</body>
+</html>
+<script>
+  function hashString(message) {
+    const msgBuffer = new TextEncoder().encode(message);
+    return crypto.subtle.digest('SHA-256', msgBuffer)
+            .then(hashBuffer => {
+              const hashArray = Array.from(new Uint8Array(hashBuffer));
+              return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            });
+  };
+
+  function c() {
+    var t = []
+            , n = document.createElement("canvas")
+            , a = (n.width = 2e3,
+            n.height = 200,
+            n.style.display = "inline",
+            n.getContext("2d"));
+    if (a.rect(0, 0, 10, 10),
+            a.rect(2, 2, 6, 6),
+            t.push("canvas winding:" + (a.isPointInPath(5, 5, "evenodd") === false ? "yes" : "no")),
+            a.textBaseline = "alphabetic",
+            a.fillStyle = "#f60",
+            a.fillRect(125, 1, 62, 20),
+            a.fillStyle = "#069",
+            false)
+      a.font = "11pt Arial";
+    else
+      a.font = "11pt no-real-font-123";
+    if (a.fillText("Cwm fjordbank glyphs vext quiz, 😃", 2, 15),
+            a.fillStyle = "rgba(102, 204, 0, 0.2)",
+            a.font = "18pt Arial",
+            a.fillText("Cwm fjordbank glyphs vext quiz, 😃", 4, 45),
+            a.globalCompositeOperation = "multiply",
+            a.fillStyle = "rgb(255,0,255)",
+            a.beginPath(),
+            a.arc(50, 50, 50, 0, Math.PI * 2, true),
+            a.closePath(),
+            a.fill(),
+            a.fillStyle = "rgb(0,255,255)",
+            a.beginPath(),
+            a.arc(100, 50, 50, 0, Math.PI * 2, true),
+            a.closePath(),
+            a.fill(),
+            a.fillStyle = "rgb(255,255,0)",
+            a.beginPath(),
+            a.arc(75, 100, 50, 0, Math.PI * 2, true),
+            a.closePath(),
+            a.fill(),
+            a.fillStyle = "rgb(255,0,255)",
+            a.arc(75, 75, 75, 0, Math.PI * 2, true),
+            a.arc(75, 75, 25, 0, Math.PI * 2, true),
+            a.fill("evenodd"),
+            n.toDataURL)
+      t.push(n.toDataURL());
+    return t
+  }
+
+  async function main(){
+    const r = c();
+    const imgHash = await hashString(r[1]);
+    const result = {
+      "img_data": r[0],
+      "img": r[1],
+      "img_hash": imgHash
+    }
+    document.getElementById('result').innerText = JSON.stringify(result, null, 2);
+    const imgEl = document.createElement('img');
+    imgEl.src = r[1];
+    document.body.appendChild(imgEl);
+
+  }
+  main();
+
+</script>
