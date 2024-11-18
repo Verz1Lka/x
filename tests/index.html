@@ -18,6 +18,8 @@ Iframe Navigator
         height="400"
         src="https://evgeny.me/hl/basic.html">
 </iframe>
+On message receiver
+<pre id="onMessageResult"></pre>
 WebWorker
 <pre id="webWorkerRes"></pre>
 Service Worker
@@ -26,5 +28,11 @@ Tests
 <pre id="new-tests"></pre>
 <script src="new_tests.js"></script>
 <script src="./helper_tests.js"></script>
+<script>
+    window.addEventListener('message', function(event) {
+        // event.data
+        document.getElementById('onMessageResult').innerHTML += JSON.stringify(event.data, null, 2);
+    });
+</script>
 
         
