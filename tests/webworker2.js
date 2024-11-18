@@ -13,7 +13,8 @@ if (ext) {
 }
 
 var workerData = {
-  userAgent: navigator.userAgent, appVersion: navigator.appVersion,
+  userAgent: navigator.userAgent,
+  appVersion: navigator.appVersion,
   platform: navigator.platform,
   webdriver: navigator.webdriver,
   deviceMemory: navigator.deviceMemory,

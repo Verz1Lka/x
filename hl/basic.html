@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+WebWorker
+<pre id="results"></pre>
+
+</body>
+</html>
+<script>
+    const properties = ["userAgent", "platform", "webdriver","deviceMemory", "hardwareConcurrency", "languages"];
+    const jsFingerprint = {};
+    properties.forEach(function(property) {
+        jsFingerprint[property] = navigator[property];
+    });
+    //console.log(jsFingerprint);
+    document.getElementById('results').innerHTML = JSON.stringify(jsFingerprint, null, 2);
+    window.parent.postMessage(jsFingerprint, '*');
+</script>
