@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сравнение ширины текста в разных шрифтах</title>
+  <style>
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    .controls label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .controls input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .controls button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: auto 500px; /* Левая колонка автоширина, правая — фиксированная */
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .left-column {
+      padding: 5px;
+      background-color: #e0e0e0;
+      border: 1px solid #ccc;
+      font-size: 48px;
+      font-family: inherit;
+      /* Предотвращаем растягивание левой колонки */
+      justify-self: start;
+      width: max-content; /* Ширина соответствует содержимому */
+    }
+    .right-column {
+      font-size: 24px;
+      color: #555;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+<div class="controls">
+  <label>
+    Текст для отображения:
+    <input type="text" id="text-input" placeholder="Введите текст" value="Пример текста">
+  </label>
+  <label>
+    Список шрифтов (через запятую):
+    <input type="text" id="fonts-input" placeholder="Введите шрифты" value="Arial, Times New Roman, Courier New, Georgia, Verdana">
+  </label>
+  <button id="display-button">Отобразить</button>
+</div>
+<div class="container" id="font-container">
+  <!-- Здесь будут добавлены строки с текстом и данными -->
+</div>
+
+<script>
+  function renderFontRow(fontName, text, fontSize) {
+    // Создаем строку
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'row';
+
+    // Создаем левую колонку с текстом
+    const leftDiv = document.createElement('div');
+    leftDiv.className = 'left-column';
+    leftDiv.style.fontFamily = fontName;
+    leftDiv.style.fontSize = fontSize;
+    leftDiv.textContent = text;
+
+    // Добавляем левую колонку в строку
+    rowDiv.appendChild(leftDiv);
+
+    // Добавляем строку в документ, чтобы измерить ширину текста
+    const container = document.getElementById('font-container');
+    container.appendChild(rowDiv);
+
+    // Получаем ширину текстового элемента после добавления в DOM
+    const textWidth = leftDiv.offsetWidth;
+
+    // Создаем правую колонку с данными
+    const rightDiv = document.createElement('div');
+    rightDiv.className = 'right-column';
+    rightDiv.innerHTML = `<div>Шрифт: ${fontName}</div><div>Ширина: ${textWidth}px</div>`;
+
+    // Добавляем правую колонку в строку
+    rowDiv.appendChild(rightDiv);
+
+  }
+
+  document.getElementById('display-button').addEventListener('click', function() {
+    const text = document.getElementById('text-input').value;
+    const fontsInput = document.getElementById('fonts-input').value;
+    const fonts = fontsInput.split(',').map(font => font.trim());
+    const FONT_SIZE = '48px';
+
+    // Очищаем контейнер перед отображением новых данных
+    const container = document.getElementById('font-container');
+    container.innerHTML = '';
+
+    fonts.forEach(fontName => {
+      renderFontRow(fontName, text, FONT_SIZE);
+    });
+  });
+
+  document.getElementById('display-button').click();
+
+</script>
+</body>
+</html>
