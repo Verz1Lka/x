@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CSS Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .result {
+      margin-top: 20px;
+    }
+    .result p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+<h1>CSS Test</h1>
+<div id="test-element"></div>
+<div class="result" id="results"></div>
+
+<script>
+  (function() {
+    var e = document.getElementById("test-element");
+    e.style = "all:unset; display:block; width:100px; height:100px; overflow:scroll; color: rgb(calc(var(--x2) + var(--x5) * var(--x1) / var(--x0) * var(--x4) - var(--x5)), calc(var(--x2) + var(--x3) * var(--x3) / var(--x4) * var(--x0) - var(--x0)), calc(var(--x4) + var(--x0) * var(--x1) / var(--x2) * var(--x3) - var(--x5))); transform: perspective(var(--x6)) rotate3d(var(--x0), var(--x1), var(--x2), var(--x7)) scale3d(var(--x3), var(--x4), var(--x5)) rotateX(var(--x8)) translateZ(var(--x6)); background-color: currentColor; border: 1px solid black;";
+
+    // Статичные значения для переменных
+    var staticValues = [
+      10.00, // --x0
+      5.00,  // --x1
+      15.00, // --x2
+      7.50,  // --x3
+      12.50, // --x4
+      2.50,  // --x5
+      100.00, // --x6 (для perspective и translateZ)
+      45.00, // --x7 (для rotate3d) в градусах
+      0.25   // --x8 (для rotateX) в оборотах
+    ];
+
+    var n = "";
+    for (var i = 0; i < staticValues.length; ++i) {
+      var a = staticValues[i];
+      n += a + (i < staticValues.length - 1 ? "," : "");
+      // Добавляем единицы измерения для определенных индексов
+      if (i == 6) a += "px";     // --x6
+      if (i == 7) a += "deg";    // --x7
+      if (i == 8) a += "turn";   // --x8
+      e.style.setProperty("--x" + i, a);
+    }
+
+    var g = getComputedStyle(e);
+    var j = g.color.slice(4, -1) || "NA";
+    var y = g.transform.slice(9, -1) || "NA";
+    var v = g.height || "NA";
+    // Оставляем элемент на странице для визуального отображения
+
+    // Функция для вывода результатов на страницу
+    function output(key, value) {
+      var resultsDiv = document.getElementById("results");
+      var p = document.createElement("p");
+      p.textContent = key + ": " + value;
+      resultsDiv.appendChild(p);
+    }
+
+    output("cssS", n);
+    output("css0", j);
+    output("css1", y);
+    output("cssH", v);
+  })();
+</script>
+</body>
+</html>
