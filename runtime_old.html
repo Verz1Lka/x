@@ -1,0 +1,6 @@
+<span id="result">no issues</span>
+<script>console.log(Object.defineProperty(
+    Error(),
+    "stack",
+    { get() { document.getElementById("result").innerText = "CDP Runtime detected" } }
+))</script>

@@ -1,6 +1,29 @@
-<span id="result">no issues</span>
-<script>console.log(Object.defineProperty(
-    Error(),
-    "stack",
-    { get() { document.getElementById("result").innerText = "CDP Runtime detected" } }
-))</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Runtime Leak Detection</title>
+</head>
+<body>
+<pre id="results">No Runtime Leaks Detected</pre>
+<script>
+    function checkRuntimeLeak() {
+        let detected = false;
+        let e = new Error();
+        Object.defineProperty(e, 'stack', {
+            get() {
+                detected = true;
+            }
+        });
+        console.log(e); // Trigger the getter for 'stack'
+        const result = {
+            runtime_leak_detected: detected
+        };
+        document.getElementById('results').innerHTML = JSON.stringify(result, null, 2);
+    }
+
+    // Run the test every second
+    setInterval(checkRuntimeLeak, 1000);
+</script>
+</body>
+</html>
