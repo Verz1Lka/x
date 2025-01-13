@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandbox API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>Sandbox API Test Results</h1>
+<iframe id="sandboxed" sandbox style="width: 100%; height: 200px; border: 1px solid #ddd;"></iframe>
+<h2>Results:</h2>
+<pre id="results">Running tests...</pre>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const iframe = document.getElementById('sandboxed');
+        const resultsElement = document.getElementById('results');
+
+        // iframe.onload = () => {
+            const iframeWindow = iframe.contentWindow;
+            const testResults = {
+                ClipboardAPI: 'clipboard' in iframeWindow.navigator,
+                GeolocationAPI: 'geolocation' in iframeWindow.navigator,
+                IndexedDB: 'indexedDB' in iframeWindow,
+                FullscreenAPI: 'requestFullscreen' in iframeWindow.document,
+                PaymentAPI: 'PaymentRequest' in iframeWindow,
+                StorageAPI: {
+                    localStorage: 'localStorage' in iframeWindow,
+                    sessionStorage: 'sessionStorage' in iframeWindow
+                },
+                WebRTC: 'mediaDevices' in iframeWindow.navigator
+            };
+
+            resultsElement.textContent = JSON.stringify(testResults, null, 2);
+        //};
+    });
+</script>
+</body>
+</html>
