@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Testing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    pre {
+      background-color: #f4f4f4;
+      border: 1px solid #ccc;
+      padding: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .status {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<h1>API Testing Results</h1>
+<p><span class="status">Running tests...</span></p>
+<pre id="results">Loading...</pre>
+
+<script>
+  async function testAPIs() {
+    const results = {};
+
+    // Test enumerateDevices
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        results.enumerateDevices = {
+          success: true,
+          devices: devices.map(device => ({
+            kind: device.kind,
+            label: device.label,
+            deviceId: device.deviceId,
+            groupId: device.groupId
+          }))
+        };
+      } else {
+        results.enumerateDevices = {
+          success: false,
+          error: "MediaDevices API not supported"
+        };
+      }
+    } catch (error) {
+      results.enumerateDevices = {
+        success: false,
+        error: error.message
+      };
+    }
+
+    // Test Bluetooth
+    try {
+      if ("bluetooth" in navigator) {
+        const availability = await navigator.bluetooth.getAvailability();
+        results.bluetooth = {
+          success: true,
+          available: availability
+        };
+      } else {
+        results.bluetooth = {
+          success: false,
+          error: "Bluetooth API not supported"
+        };
+      }
+    } catch (error) {
+      results.bluetooth = {
+        success: false,
+        error: error.message
+      };
+    }
+
+    // Test DRM (Widevine)
+    try {
+      if (navigator.requestMediaKeySystemAccess) {
+        await navigator.requestMediaKeySystemAccess("com.widevine.alpha", [{
+          initDataTypes: ["webm"],
+          audioCapabilities: [{ contentType: "audio/webm; codecs=opus" }]
+        }]);
+        results.drm = {
+          success: true,
+          supported: true
+        };
+      } else {
+        results.drm = {
+          success: false,
+          error: "MediaKeySystemAccess API not supported"
+        };
+      }
+    } catch (error) {
+      results.drm = {
+        success: false,
+        error: error.message
+      };
+    }
+
+    // Display results
+    document.querySelector('.status').textContent = "Tests completed!";
+    document.getElementById('results').textContent = JSON.stringify(results, null, 2);
+  }
+
+  // Run the tests
+  testAPIs();
+</script>
+</body>
+</html>
