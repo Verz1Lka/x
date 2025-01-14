@@ -14,40 +14,36 @@
         Object.getPrototypeOf(navigator)
     );
 
-    // --- Шаг 2: iframe (вместо frame) для сбора свойств ---
     const frame = document.createElement("frame");
     document.body.appendChild(frame);
-
-    const frameNavigator = frame.contentWindow.navigator;
+    const frameContentWindow = frame.contentWindow
     document.body.removeChild(frame);
 
-    // Получаем свойства navigator из iframe
-    const props2 =  Object.getOwnPropertyNames(frameNavigator.__proto__)
+    const props2 =  Object.getOwnPropertyNames(frameContentWindow.navigator.__proto__)
 
     const sandboxedFrame = document.createElement("iframe");
     sandboxedFrame.setAttribute("sandbox", "allow-same-origin");
+    sandboxedFrame.srcdoc = "<script/>"
 
     document.body.appendChild(sandboxedFrame);
 
+    const sandboxedFrameContentWindow = sandboxedFrame.contentWindow
+    document.body.removeChild(sandboxedFrame);
+
     let props3;
     try {
-        // В песочном iframe часто будут ограничения
-        props3 = Object.getOwnPropertyNames(frameNavigator.__proto__)
+        props3 = Object.getOwnPropertyNames(sandboxedFrameContentWindow.navigator.__proto__)
     } catch (err) {
-        // Если вдруг доступ запрещён
         props3 = ["Error: " + err.message];
     }
 
-    document.body.removeChild(sandboxedFrame);
-
-    // --- Выводим результаты ---
     const results = document.getElementById("results");
     results.innerHTML = `
       <h2>1) Main page navigator</h2>
       <p>Count: <b>${props1.length}</b></p>
       <pre>${JSON.stringify(props1, null, 2)}</pre>
 
-      <h2>2) Iframe navigator</h2>
+      <h2>2) Frame navigator</h2>
       <p>Count: <b>${props2.length}</b></p>
       <pre>${JSON.stringify(props2, null, 2)}</pre>
 
