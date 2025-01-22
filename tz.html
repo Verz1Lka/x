@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Timezone, Locale, Language Info</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Информация о контекстах</h1>
+<pre id="output">Загрузка...</pre>
+
+<script>
+    function getLocaleInfo() {
+        const dtfOptions = Intl.DateTimeFormat().resolvedOptions();
+        return {
+            language: navigator.language || navigator.userLanguage || 'не определён',
+            locale: dtfOptions.locale || 'не определён',
+            timezone: dtfOptions.timeZone || 'не определён'
+        };
+    }
+    const mainContextInfo = getLocaleInfo();
+    const result = {
+        mainContext: mainContextInfo,
+        iframeContext: null
+    };
+    function displayResult() {
+        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+    }
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.iframeContext) {
+            result.iframeContext = event.data.iframeContext;
+            displayResult();
+        }
+    }, false);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none'; // скрываем iframe
+    document.body.appendChild(iframe);
+    iframe.addEventListener('load', function() {
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+        const script = iframeDocument.createElement('script');
+        script.type = 'text/javascript';
+
+        script.textContent = `
+        (function() {
+          function getLocaleInfo() {
+            const dtfOptions = Intl.DateTimeFormat().resolvedOptions();
+            return {
+              language: navigator.language || navigator.userLanguage || 'не определён',
+              locale: dtfOptions.locale || 'не определён',
+              timezone: dtfOptions.timeZone || 'не определён'
+            };
+          }
+          const iframeContextInfo = getLocaleInfo();
+          parent.postMessage({ iframeContext: iframeContextInfo }, '*');
+        })();
+      `;
+        iframeDocument.body.appendChild(script);
+    });
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body></body></html>');
+    iframeDoc.close();
+
+    displayResult();
+</script>
+</body>
+</html>
