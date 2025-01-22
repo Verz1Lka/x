@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Timezone, Locale, Language Info</title>
+    <title>Информация с защищённым iframe</title>
     <style>
         body {
             font-family: sans-serif;
@@ -15,10 +15,11 @@
     </style>
 </head>
 <body>
-<h1>Tz context test</h1>
-<pre id="output">Loading...</pre>
+<h1>Информация о контекстах</h1>
+<pre id="output">Загрузка...</pre>
 
 <script>
+    // Функция для получения информации о языковой среде
     function getLocaleInfo() {
         const dtfOptions = Intl.DateTimeFormat().resolvedOptions();
         return {
@@ -27,51 +28,68 @@
             timezone: dtfOptions.timeZone || 'не определён'
         };
     }
+
+    // Получаем информацию для основного контекста
     const mainContextInfo = getLocaleInfo();
+
+    // Объект для объединения результатов
     const result = {
         mainContext: mainContextInfo,
-        iframeContext: null
+        iframeContext: null // сюда запишутся данные из iframe
     };
+
+    // Функция для отображения результата
     function displayResult() {
         document.getElementById('output').textContent = JSON.stringify(result, null, 2);
     }
+
+    // Слушаем сообщения от iframe
     window.addEventListener('message', function(event) {
+        // В реальной разработке обязательно проверяйте event.origin!
         if (event.data && event.data.iframeContext) {
             result.iframeContext = event.data.iframeContext;
             displayResult();
         }
     }, false);
 
+    // Создаём iframe с sandbox, разрешающим выполнение скриптов
     const iframe = document.createElement('iframe');
     iframe.setAttribute('sandbox', 'allow-scripts');
-    iframe.style.display = 'none'; // скрываем iframe
+    // Скрываем iframe, если он не нужен для отображения
+    iframe.style.display = 'none';
+
+    // Задаём содержимое iframe через srcdoc, чтобы не обращаться к его document напрямую
+    iframe.srcdoc = `
+      <!DOCTYPE html>
+      <html lang="ru">
+      <head>
+        <meta charset="UTF-8">
+        <title>Sandboxed iframe</title>
+      </head>
+      <body>
+        <script>
+          (function() {
+            function getLocaleInfo() {
+              const dtfOptions = Intl.DateTimeFormat().resolvedOptions();
+              return {
+                language: navigator.language || navigator.userLanguage || 'не определён',
+                locale: dtfOptions.locale || 'не определён',
+                timezone: dtfOptions.timeZone || 'не определён'
+              };
+            }
+            // Собираем информацию и отправляем её родительскому окну
+            var iframeContextInfo = getLocaleInfo();
+            parent.postMessage({ iframeContext: iframeContextInfo }, '*');
+          })();
+        <\/script>
+      </body>
+      </html>
+    `;
+
+    // Добавляем iframe в DOM
     document.body.appendChild(iframe);
-    iframe.addEventListener('load', function() {
-        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-        const script = iframeDocument.createElement('script');
-        script.type = 'text/javascript';
 
-        script.textContent = `
-        (function() {
-          function getLocaleInfo() {
-            const dtfOptions = Intl.DateTimeFormat().resolvedOptions();
-            return {
-              language: navigator.language || navigator.userLanguage || 'не определён',
-              locale: dtfOptions.locale || 'не определён',
-              timezone: dtfOptions.timeZone || 'не определён'
-            };
-          }
-          const iframeContextInfo = getLocaleInfo();
-          parent.postMessage({ iframeContext: iframeContextInfo }, '*');
-        })();
-      `;
-        iframeDocument.body.appendChild(script);
-    });
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body></body></html>');
-    iframeDoc.close();
-
+    // Выводим данные основного контекста до получения сообщения от iframe
     displayResult();
 </script>
 </body>
