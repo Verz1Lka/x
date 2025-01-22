@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Родительский сайт</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>TZ parent</h1>
+<pre id="output">Loading...</pre>
+
+<script>
+    function getLocaleInfo() {
+        const dtfOptions = Intl.DateTimeFormat().resolvedOptions();
+        return {
+            language: navigator.language || 'undefined',
+            locale: dtfOptions.locale || 'undefined',
+            timezone: dtfOptions.timeZone || 'undefined'
+        };
+    }
+    const mainContextInfo = getLocaleInfo();
+    const result = {
+        mainContext: mainContextInfo,
+        iframeContext: null
+    };
+    function displayResult() {
+        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+    }
+
+    // Слушаем сообщения от iframe
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.iframeContext) {
+            result.iframeContext = event.data.iframeContext;
+            displayResult();
+        }
+    }, false);
+
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://x.evgeny.me/tzf.html';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    displayResult();
+</script>
+</body>
+</html>
