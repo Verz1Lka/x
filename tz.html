@@ -15,8 +15,8 @@
     </style>
 </head>
 <body>
-<h1>Информация о контекстах</h1>
-<pre id="output">Загрузка...</pre>
+<h1>Tz context test</h1>
+<pre id="output">Loading...</pre>
 
 <script>
     function getLocaleInfo() {
@@ -43,6 +43,7 @@
     }, false);
 
     const iframe = document.createElement('iframe');
+    iframe.setAttribute('sandbox', 'allow-scripts');
     iframe.style.display = 'none'; // скрываем iframe
     document.body.appendChild(iframe);
     iframe.addEventListener('load', function() {
