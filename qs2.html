@@ -1,6 +1,7 @@
 <span id="results"></span>
 <script>
-    func = function(t) {
+    func = function() {
+        const t = Function["prototype"]["toString"];
         try {
             var i = 0, u = 0;
             Function["prototype"]["toString"] = function() {
