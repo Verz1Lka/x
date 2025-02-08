@@ -10,54 +10,40 @@
 </body>
 </html>
 <script>
-    function testToStringInterception() {
-        // Сохраняем исходные ссылки на методы.
-        const originalFunctionToString = Function.prototype.toString;
-        const originalObjectToString = Object.prototype.toString;
-
-        let functionToStringCalls = 0;
-        let objectToStringCalls = 0;
-
-        try {
-            // Подменяем Function.prototype.toString.
-            Function.prototype.toString = function() {
-                functionToStringCalls++;
-                // Возвращаем фиктивную строку, чтобы не ломать логику где-то в коде.
-                return "function override placeholder";
-            };
-
-            // Подменяем Object.prototype.toString.
-            Object.prototype.toString = function() {
-                objectToStringCalls++;
-                return "object override placeholder";
-            };
-
-            // Выполним несколько действий,
-            // чтобы проявились вызовы подменённых методов:
-            console.log("Проверка перехвата toString...");
-
-            // Явный вызов toString у функции:
-            (function exampleFunction() {}).toString();
-            // Явный вызов toString у объекта:
-            ({}).toString();
-
-            // Возвращаем счетчики
-            return [functionToStringCalls, objectToStringCalls];
-        } catch (error) {
-            // Если что-то пошло не так, вернём признак ошибки
-            return [-1, -1];
-        } finally {
-            // Восстанавливаем исходные методы в любом случае.
-            Function.prototype.toString = originalFunctionToString;
-            Object.prototype.toString = originalObjectToString;
+    func = function(t) {
+        var
+            n = {};
+        n["fuXSf"] = "tUiZv";
+        var W = n;
+        if (false) {} else {
+            var c = Function["prototype"]["toString"],
+                a = Object["prototype"]["toString"];
+            try {
+                if ("zsfir" !== "IljnQ") {
+                    var i = 0,
+                        u = 0;
+                    return Function["prototype"]["toString"] = function() {
+                        if (W["fuXSf"] === W["fuXSf"]) return i += 1, "";
+                    }, Object["prototype"]["toString"] = function() {
+                        var
+                            o = {};
+                        o["EliGd"] = function(t, o) {
+                            return t(o);
+                        }, o["GNVYK"] = function(o, e) {
+                            return r["mBKlt"](o, e);
+                        }, o["iELuo"] = r["hPGBm"];
+                        if (!r["qguvd"]("bYpzp", "bYpzp")) return u += 1, "";
+                    }, console["log"](t), console["clear"](), [i, u];
+                }
+            } catch (t) {
+                return [-1, -1];
+            } finally {
+                if (false) {} else Function["prototype"]["toString"] = c, Object["prototype"]["toString"] = a;
+            }
         }
-    }
-
-    // Пример использования:
-    const [fnCalls, objCalls] = testToStringInterception();
-    console.log("Function toString calls:", fnCalls);
-    console.log("Object toString calls:  ", objCalls);
-  document.getElementById("results").innerHTML = JSON.stringify([fnCalls, objCalls]);
+    };
+    const results = func(Function["prototype"]["toString"]);
+  document.getElementById("results").innerHTML = JSON.stringify(results);
   // console.log("Function toString calls:", fnCalls);
   // console.log("Object toString calls:  ", objCalls);
 </script>
