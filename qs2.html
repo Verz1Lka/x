@@ -4,8 +4,8 @@
     const func_proto_toString = Function.prototype.toString;
     Function.prototype.toString = function() {
         called = 'YES';
-        return "";
+        // return "";
     };
-    console.log(func_proto_toString);
+    console.log(Function.prototype.toString);
     document.getElementById("results").innerHTML += called;
 </script>
