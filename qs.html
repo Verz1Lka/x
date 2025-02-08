@@ -13,29 +13,33 @@
     function testToStringInterception() {
         // Сохраняем исходные ссылки на методы.
         const originalFunctionToString = Function.prototype.toString;
-        const originalObjectToString   = Object.prototype.toString;
+        const originalObjectToString = Object.prototype.toString;
 
         let functionToStringCalls = 0;
-        let objectToStringCalls   = 0;
+        let objectToStringCalls = 0;
 
         try {
             // Подменяем Function.prototype.toString.
             Function.prototype.toString = function() {
                 functionToStringCalls++;
-                // Возвращаем фиктивную строку
+                // Возвращаем фиктивную строку, чтобы не ломать логику где-то в коде.
                 return "function override placeholder";
             };
 
             // Подменяем Object.prototype.toString.
-            // Но здесь мы считаем вызовы, однако не будем явно его вызывать,
-            // чтобы в итоге получить 0.
             Object.prototype.toString = function() {
                 objectToStringCalls++;
                 return "object override placeholder";
             };
 
-            // Явно вызываем toString только у функции (1 раз).
+            // Выполним несколько действий,
+            // чтобы проявились вызовы подменённых методов:
+            console.log("Проверка перехвата toString...");
+
+            // Явный вызов toString у функции:
             (function exampleFunction() {}).toString();
+            // Явный вызов toString у объекта:
+            ({}).toString();
 
             // Возвращаем счетчики
             return [functionToStringCalls, objectToStringCalls];
@@ -45,14 +49,14 @@
         } finally {
             // Восстанавливаем исходные методы в любом случае.
             Function.prototype.toString = originalFunctionToString;
-            Object.prototype.toString   = originalObjectToString;
+            Object.prototype.toString = originalObjectToString;
         }
     }
 
     // Пример использования:
     const [fnCalls, objCalls] = testToStringInterception();
-    console.log("Function toString calls:", fnCalls); // Ожидается 1
-    console.log("Object toString calls:  ", objCalls); // Ожидается 0
+    console.log("Function toString calls:", fnCalls);
+    console.log("Object toString calls:  ", objCalls);
   document.getElementById("results").innerHTML = JSON.stringify([fnCalls, objCalls]);
   // console.log("Function toString calls:", fnCalls);
   // console.log("Object toString calls:  ", objCalls);
