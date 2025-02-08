@@ -1,15 +1,15 @@
 <span id="results">Called: </span>
 <script>
-    let called = false;
+    let called = 'NO';
     func = function() {
         const t = Function["prototype"]["toString"];
         Function["prototype"]["toString"] = function() {
-            called = true;
+            called = 'YES';
             return "";
         };
         console["log"](t);
         return;
     };
-    const results = func();
+    func();
     document.getElementById("results").innerHTML += JSON.stringify(results) + called;
 </script>
