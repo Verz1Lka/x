@@ -4,7 +4,8 @@
         try {
             var i = 0, u = 0;
             Function["prototype"]["toString"] = function() {
-                return i += 1, "";
+                i += 1;
+                return "";
             };
             console["log"](t);
             return [i, u];
