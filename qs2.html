@@ -7,17 +7,15 @@
 </html>
 <script>
     func = function(t) {
-        //var c = Function["prototype"]["toString"];
         try {
-            var i = 0,
-                u = 0;
-            return Function["prototype"]["toString"] = function() {
+            var i = 0, u = 0;
+            Function["prototype"]["toString"] = function() {
                 return i += 1, "";
-            }, console["log"](t), [i, u];
+            };
+            console["log"](t);
+            return [i, u];
         } catch (t) {
             return [-1, -1];
-        } finally {
-            //if (false) {} else Function["prototype"]["toString"] = c;
         }
     };
     const results = func(Function["prototype"]["toString"]);
