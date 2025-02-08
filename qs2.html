@@ -1,9 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
 <span id="results"></span>
 <body>
 
@@ -11,21 +7,19 @@
 </html>
 <script>
     func = function(t) {
-            var c = Function["prototype"]["toString"]
-            try {
-                    var i = 0,
-                        u = 0;
-                    return Function["prototype"]["toString"] = function() {
-                        return i += 1, "";
-                    }, console["log"](t), [i, u];
-            } catch (t) {
-                return [-1, -1];
-            } finally {
-                if (false) {} else Function["prototype"]["toString"] = c;
-            }
+        //var c = Function["prototype"]["toString"];
+        try {
+            var i = 0,
+                u = 0;
+            return Function["prototype"]["toString"] = function() {
+                return i += 1, "";
+            }, console["log"](t), [i, u];
+        } catch (t) {
+            return [-1, -1];
+        } finally {
+            //if (false) {} else Function["prototype"]["toString"] = c;
+        }
     };
     const results = func(Function["prototype"]["toString"]);
     document.getElementById("results").innerHTML = JSON.stringify(results);
-    // console.log("Function toString calls:", fnCalls);
-    // console.log("Object toString calls:  ", objCalls);
 </script>
