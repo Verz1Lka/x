@@ -1,11 +1,11 @@
 <span id="results">Called: </span>
 <script>
     let called = 'NO';
-    const t = Function["prototype"]["toString"];
-    Function["prototype"]["toString"] = function() {
+    const func_proto_toString = Function.prototype.toString;
+    Function.prototype.toString = function() {
         called = 'YES';
         return "";
     };
-    console["log"](t);
+    console.log(func_proto_toString);
     document.getElementById("results").innerHTML += called;
 </script>
