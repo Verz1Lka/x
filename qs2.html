@@ -1,11 +1,13 @@
-<span id="results"></span>
+<span id="results">Called: </span>
 <script>
+    let called = false;
     func = function() {
         const t = Function["prototype"]["toString"];
         try {
             var i = 0, u = 0;
             Function["prototype"]["toString"] = function() {
                 i += 1;
+                called = true;
                 return "";
             };
             console["log"](t);
@@ -14,6 +16,6 @@
             return [-1, -1];
         }
     };
-    const results = func(Function["prototype"]["toString"]);
-    document.getElementById("results").innerHTML = JSON.stringify(results);
+    const results = func();
+    document.getElementById("results").innerHTML += JSON.stringify(results) + called;
 </script>
