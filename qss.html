@@ -2,7 +2,8 @@
 <script>
     x = {
         dvh: document.webkitHidden,
-        dwvs: document.webkitVisibilityState
+        dwvs: document.webkitVisibilityState,
+        dhf: document.hasFocus()
     }
     document.getElementById("results").innerHTML = JSON.stringify(x, null, 4);
 </script>
