@@ -3079,6 +3079,7 @@
                   ww = "errored";
                 }
                 BA = Mf.toDataURL();
+                _xFp["CANVAS_IMG"] = BA;
               } catch (wM) {
                 cL["GeBhy_c="] = wM.toString();
               }
