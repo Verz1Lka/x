@@ -3352,6 +3352,7 @@
                     s_.AcZt = null;
                     try {
                       eB = DH.canvas.toDataURL();
+                      _xFp["WEB_GL_CANVAS_IMG"] = eB;
                       try {
                         var Ob = 4;
                         var eu = 4;
