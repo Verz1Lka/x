@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SpeechSynthesis Info</title>
+</head>
+<body>
+<pre id="output">Loading...</pre>
+
+<script>
+    function Qt(e) {
+        try {
+            let t = 0;
+            for (let a = 0, n = e.length; a < n;) {
+                t = (t << 5) - t + e.charCodeAt(a++) | 0;
+            }
+            return t + 2147483647 + 1;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    function collectVoicesInfo() {
+        const output = document.getElementById('output');
+
+        if (!window.speechSynthesis) {
+            output.textContent = JSON.stringify({
+                localVoiceCount: -1,
+                remoteVoiceCount: -1,
+                uniqueLanguageCount: -1,
+                defaultLocalVoiceHash: 0
+            }, null, 2);
+            return;
+        }
+
+        function processVoices() {
+            const voices = speechSynthesis.getVoices();
+
+            const localVoices = voices.filter(v => v.localService).map(v => v.name);
+            const remoteVoices = voices.filter(v => !v.localService).map(v => v.name);
+            const uniqueLanguages = new Set(voices.map(v => v.lang));
+            const defaultLocalVoice = voices.find(v => v.default && v.localService);
+
+            const result = {
+                localVoiceCount: localVoices.length,
+                remoteVoiceCount: remoteVoices.length,
+                uniqueLanguageCount: uniqueLanguages.size,
+                defaultLocalVoiceHash: Qt(defaultLocalVoice ? defaultLocalVoice.name : ""),
+                localVoices: localVoices,
+                remoteVoices: remoteVoices,
+                uniqueLanguages: [...uniqueLanguages],
+                defaultLocalVoice: defaultLocalVoice ? {
+                    name: defaultLocalVoice.name,
+                    lang: defaultLocalVoice.lang,
+                    voiceURI: defaultLocalVoice.voiceURI,
+                    default: defaultLocalVoice.default
+                } : null
+            };
+
+            output.textContent = JSON.stringify(result, null, 2);
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = processVoices;
+        } else {
+            speechSynthesis.addEventListener("voiceschanged", processVoices);
+        }
+
+        processVoices(); // Запускаем сразу при загрузке
+    }
+
+    collectVoicesInfo();
+</script>
+</body>
+</html>
