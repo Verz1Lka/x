@@ -1,0 +1,75 @@
+<body><pre id="result"></pre></body>
+<script>
+    (async function() {
+        const result = {};
+
+        if (!navigator.gpu) {
+            result.error = "noGpu";
+            document.body.innerText = JSON.stringify(result, null, 2);
+            return;
+        }
+
+        try {
+            result.preferedCanvasFormat = navigator.gpu.getPreferredCanvasFormat();
+            const adapter = await navigator.gpu.requestAdapter();
+            if (!adapter) {
+                result.error = "noAdapter";
+                document.body.innerText = JSON.stringify(result, null, 2);
+                return;
+            }
+
+            // Фичи
+            try {
+                result.features = Array.from(adapter.features.values());
+            } catch (e) {
+                result.featuresError = e.message;
+            }
+
+            // Информация об адаптере
+            if ("requestAdapterInfo" in adapter) {
+                try {
+                    result.adapterInfo = await adapter.requestAdapterInfo();
+                } catch (e) {
+                    result.adapterInfoError = e.message;
+                }
+            } else if ("info" in adapter) {
+                result.adapterInfo = adapter.info;
+                const adapterInfoKeys = Object.keys(Object.getPrototypeOf(adapter.info));
+                const adapterData = {};
+                for (let key of adapterInfoKeys) {
+                    adapterData[key] = adapter.info[key];
+                }
+                result.adapterInfo = adapterData;
+            } else {
+                result.adapterInfo = "noInfo";
+            }
+
+            // Лимиты адаптера
+            try {
+                result.limits = {
+                    maxBufferSize: adapter.limits.maxBufferSize,
+                    maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize
+                };
+            } catch (e) {
+                result.limitsError = e.message;
+            }
+
+            // wgslLanguageFeatures
+            try {
+                const langFeatures = navigator.gpu.wgslLanguageFeatures;
+                if (langFeatures.size > 0) {
+                    result.wgslLanguageFeatures = Array.from(langFeatures.values());
+                }
+            } catch (e) {
+                result.wgslLanguageFeaturesError = e.message;
+            }
+
+        } catch (e) {
+            result.error = e.message;
+        }
+
+        // Вывод в JSON
+        const r = document.getElementById('result');
+        r.innerText = JSON.stringify(result, null, 2);
+    })();
+</script>
