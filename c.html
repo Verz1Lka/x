@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browser Profile Collector</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        #output {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            white-space: pre-wrap;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        .loading {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Browser Profile Collector</h1>
+<div class="loading" id="loading">Collecting data, please wait...</div>
+<div id="output"></div>
+
+<script>
+    async function collectProfile() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('output').textContent = '';
+
+        try {
+            // Получаем высокоэнтропийные значения
+            const highEntropyData = await navigator.userAgentData.getHighEntropyValues([
+                'architecture',
+                'bitness',
+                'formFactor',
+                'fullVersionList',
+                'model',
+                'platformVersion',
+                'uaFullVersion',
+                'wow64'
+            ]);
+
+            const profile = {
+                major_version: navigator.userAgent.match(/Chrome\/(\d+)/)[1],
+                full_version: highEntropyData.uaFullVersion || navigator.userAgent.match(/Chrome\/([\d.]+)/)[1],
+                navigator_platform: navigator.platform,
+                user_agent: navigator.userAgent,
+                tls_profile_name: "CHROME_" + navigator.userAgent.match(/Chrome\/(\d+)/)[1],
+                user_agent_data: {
+                    architecture: highEntropyData.architecture || "",
+                    bitness: highEntropyData.bitness || "",
+                    brands: highEntropyData.fullVersionList || navigator.userAgentData?.brands || [],
+                    mobile: navigator.userAgentData?.mobile || false,
+                    model: highEntropyData.model || "",
+                    platform: navigator.userAgentData?.platform || "",
+                    platformVersion: highEntropyData.platformVersion || "",
+                    wow64: highEntropyData.wow64 || false,
+                    formFactor: highEntropyData.formFactor || ""
+                },
+                unmasked_vendor: navigator.vendor,
+                unmasker_renderer: navigator.userAgentData?.platform || "",
+                screen_width: window.screen.width,
+                screen_height: window.screen.height,
+                device_memory: navigator.deviceMemory || 8,
+                hardware_concurrency: navigator.hardwareConcurrency || 8
+            };
+
+            // Получаем WebGL информацию
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    if (debugInfo) {
+                        profile.unmasked_vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+                        profile.unmasker_renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                    }
+                }
+            } catch (e) {
+                console.error('Error getting WebGL info:', e);
+            }
+
+            // Форматируем JSON для красивого отображения
+            const formattedJson = JSON.stringify(profile, null, 2);
+            document.getElementById('output').textContent = formattedJson;
+        } catch (error) {
+            document.getElementById('output').textContent = `Error collecting profile data: ${error.message}`;
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Запускаем сбор данных при загрузке страницы
+    window.addEventListener('load', collectProfile);
+</script>
+</body>
+</html>
