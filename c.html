@@ -32,6 +32,73 @@
         document.getElementById('loading').style.display = 'block';
         document.getElementById('output').textContent = '';
 
+        const gpuData = {};
+
+        if (!navigator.gpu) {
+            gpuData.error = "noGpu";
+            document.body.innerText = JSON.stringify(gpuData, null, 2);
+            return;
+        }
+
+        try {
+            gpuData.preferedCanvasFormat = navigator.gpu.getPreferredCanvasFormat();
+            const adapter = await navigator.gpu.requestAdapter();
+            if (!adapter) {
+                gpuData.error = "noAdapter";
+                document.body.innerText = JSON.stringify(gpuData, null, 2);
+                return;
+            }
+
+            // Фичи
+            try {
+                gpuData.features = Array.from(adapter.features.values());
+            } catch (e) {
+                gpuData.featuresError = e.message;
+            }
+
+            // Информация об адаптере
+            if ("requestAdapterInfo" in adapter) {
+                try {
+                    gpuData.adapterInfo = await adapter.requestAdapterInfo();
+                } catch (e) {
+                    gpuData.adapterInfoError = e.message;
+                }
+            } else if ("info" in adapter) {
+                gpuData.adapterInfo = adapter.info;
+                const adapterInfoKeys = Object.keys(Object.getPrototypeOf(adapter.info));
+                const adapterData = {};
+                for (let key of adapterInfoKeys) {
+                    adapterData[key] = adapter.info[key];
+                }
+                gpuData.adapterInfo = adapterData;
+            } else {
+                gpuData.adapterInfo = "noInfo";
+            }
+
+            // Лимиты адаптера
+            try {
+                gpuData.limits = {
+                    maxBufferSize: adapter.limits.maxBufferSize,
+                    maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize
+                };
+            } catch (e) {
+                gpuData.limitsError = e.message;
+            }
+
+            // wgslLanguageFeatures
+            try {
+                const langFeatures = navigator.gpu.wgslLanguageFeatures;
+                if (langFeatures.size > 0) {
+                    gpuData.wgslLanguageFeatures = Array.from(langFeatures.values());
+                }
+            } catch (e) {
+                gpuData.wgslLanguageFeaturesError = e.message;
+            }
+
+        } catch (e) {
+            gpuData.error = e.message;
+        }
+
         try {
             // Получаем высокоэнтропийные значения
             const highEntropyData = await navigator.userAgentData.getHighEntropyValues([
@@ -67,7 +134,8 @@
                 screen_width: window.screen.width,
                 screen_height: window.screen.height,
                 device_memory: navigator.deviceMemory || 8,
-                hardware_concurrency: navigator.hardwareConcurrency || 8
+                hardware_concurrency: navigator.hardwareConcurrency || 8,
+                gpu_data: gpuData,
             };
 
             // Получаем WebGL информацию
